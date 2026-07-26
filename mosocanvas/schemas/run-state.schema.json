@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/run-state-0.2.json",
+  "title": "MoSoCanvas Run State 0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "task_id",
+    "mode",
+    "phase",
+    "approved_checkpoint",
+    "allowed_changes",
+    "protected_elements",
+    "attempt_budget",
+    "output_requirements",
+    "verification",
+    "approval_status"
+  ],
+  "properties": {
+    "schema": { "const": "moso.run-state/0.2" },
+    "task_id": { "type": "string", "minLength": 1 },
+    "mode": { "enum": ["direction", "production", "repair", "review", "bypass"] },
+    "phase": { "enum": ["route", "frame", "direction-gate", "freeze", "preflight", "execute", "verify", "accept", "stopped"] },
+    "spec_ref": { "type": "string", "minLength": 1 },
+    "approved_checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_ref", "role"],
+      "properties": {
+        "source_ref": { "type": "string", "minLength": 1 },
+        "role": { "enum": ["reference", "approved-mockup", "production-master", "approved-output", "none"] },
+        "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+        "width_px": { "type": "integer", "minimum": 1 },
+        "height_px": { "type": "integer", "minimum": 1 },
+        "user_confirmed_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "allowed_changes": { "$ref": "#/$defs/stringArray" },
+    "protected_elements": { "$ref": "#/$defs/stringArray" },
+    "required_assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "source_ref", "status"],
+        "properties": {
+          "role": { "type": "string", "minLength": 1 },
+          "source_ref": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["authoritative", "approved", "placeholder", "missing", "unverified"] },
+          "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" }
+        }
+      }
+    },
+    "attempt_budget": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generative", "repair"],
+      "properties": {
+        "generative": { "type": "integer", "minimum": 0 },
+        "repair": { "type": "integer", "minimum": 0 },
+        "generative_used": { "type": "integer", "minimum": 0 },
+        "repair_used": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "lineage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parent_ref", "operation"],
+      "properties": {
+        "parent_ref": { "type": "string", "minLength": 1 },
+        "operation": {
+          "enum": [
+            "deterministic",
+            "masked-generative",
+            "full-frame-generative",
+            "full-regeneration",
+            "handoff"
+          ]
+        },
+        "depends_on_parent": { "type": "boolean" },
+        "branch_reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "quality_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "use_scale": { "enum": ["pending", "pass", "risk", "fail", "unobservable"] },
+        "detail_scale": { "enum": ["pending", "pass", "risk", "fail", "not-required", "unobservable"] },
+        "protected_drift": { "enum": ["pending", "none", "within-tolerance", "exceeded", "unobservable"] },
+        "trend": { "enum": ["pending", "improving", "stable", "worsening", "unknown"] },
+        "user_acceptance": { "enum": ["pending", "accepted", "rejected", "accepted-with-tradeoff"] }
+      }
+    },
+    "output_requirements": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["carrier"],
+      "properties": {
+        "carrier": { "type": "string", "minLength": 1 },
+        "formats": { "$ref": "#/$defs/stringArray" },
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "unit": { "enum": ["px", "mm", "cm", "in"] },
+        "dpi": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check", "method", "status"],
+        "properties": {
+          "check": { "type": "string", "minLength": 1 },
+          "method": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["pending", "pass", "fail", "unobservable", "user-judgment"] },
+          "evidence_ref": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "approval_status": { "enum": ["pending", "approved", "rejected", "user-overrode", "not-required"] },
+    "artifact_versions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["version", "source_ref", "status"],
+        "properties": {
+          "version": { "type": "string", "minLength": 1 },
+          "source_ref": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+          "parent": { "type": "string", "minLength": 1 },
+          "status": { "enum": ["working", "review", "approved", "obsolete", "production"] },
+          "change_reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "stop_reason": { "type": "string", "minLength": 1 }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "mode": { "const": "repair" } },
+        "required": ["mode"]
+      },
+      "then": { "required": ["lineage"] }
+    }
+  ],
+  "$defs": {
+    "stringArray": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

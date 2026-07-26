@@ -1,0 +1,247 @@
+{
+  "suite": "mosocanvas-v0.1.0",
+  "scope": "campaign key visuals, posters, and physical promotional collateral",
+  "conditions": ["B0-direct", "B1-generic-clarify-first", "M0-mosocanvas"],
+  "cases": [
+    {
+      "id": "clarify-advanced",
+      "input": "做一张高级的新品宣传图。",
+      "expected": [
+        "asks no more than three questions",
+        "distinguishes value mechanisms instead of mapping 高级 to black-gold",
+        "does not generate before outcome and carrier are selectable"
+      ],
+      "forbidden": ["empty praise", "universal aesthetic score"]
+    },
+    {
+      "id": "reference-mechanisms",
+      "input": "参考这四张复古蓝红插画做一张新图，但不要抄。",
+      "fixtures": ["four visual references"],
+      "expected": [
+        "separates extract mechanisms from do-not-copy content",
+        "limits selected visual mechanisms to three",
+        "names a template risk"
+      ],
+      "forbidden": ["style-label-only analysis", "copying exact subject or composition"]
+    },
+    {
+      "id": "reference-measured-versus-interpreted",
+      "input": "拆解这张参考图的构图、颜色和质感，并据此生成新主题。",
+      "fixtures": ["one visual reference"],
+      "expected": [
+        "states mechanism-transfer mode",
+        "separates directly observed or measured facts from interpretations",
+        "maps at most three mechanisms to execution constraints and verification",
+        "records source provenance and do-not-copy items"
+      ],
+      "forbidden": [
+        "invented exact color values without measurement",
+        "calling a subjective mood a measured fact",
+        "claiming pixel-perfect recreation"
+      ]
+    },
+    {
+      "id": "authorized-reconstruction",
+      "input": "这是我们自己拥有版权的旧海报，请在新尺寸中高保真重建。",
+      "fixtures": ["authorized poster", "target dimensions"],
+      "expected": [
+        "states owned-reconstruction mode",
+        "records an immutable source checkpoint and hash",
+        "separates geometry and asset fidelity from subjective resemblance",
+        "uses deterministic layout for exact text and logos"
+      ],
+      "forbidden": ["treating the approved poster as style-only", "unverified fidelity claim"]
+    },
+    {
+      "id": "thumbnail-brand",
+      "input": "画面很好，但品牌没名气，缩略图里必须看见名字。",
+      "expected": [
+        "prioritizes first-read brand recognition",
+        "preserves atmosphere as a second-read layer",
+        "defines a thumbnail-scale pass condition"
+      ],
+      "forbidden": ["treating subtle branding as universally superior"]
+    },
+    {
+      "id": "portrait-local-edit",
+      "input": "人物不要变，只改下方标题颜色。",
+      "fixtures": ["approved portrait with title"],
+      "expected": [
+        "routes typography recolor to deterministic compositing when possible",
+        "starts from immutable approved source",
+        "requires protected-region verification"
+      ],
+      "forbidden": [
+        "guaranteed preservation from prompt alone",
+        "unverified full-frame edits presented as local"
+      ]
+    },
+    {
+      "id": "portrait-texture-drift",
+      "input": "检查第三轮编辑后的脸部是否自然。",
+      "fixtures": ["original portrait", "third-round edit"],
+      "expected": [
+        "inspects at 100 to 200 percent",
+        "checks repeated fingerprint or topographic microtexture",
+        "compares against original rather than judging polish alone"
+      ],
+      "forbidden": ["accepting overall attractiveness as technical quality"]
+    },
+    {
+      "id": "skin-texture-pathology-repair",
+      "input": "整体已经很好，只修掉人物皮肤上的地形纹和鳞片感，其他都不要变。",
+      "fixtures": ["approved full-frame image", "100-percent torso crop with continuous maze-like line network"],
+      "expected": [
+        "classifies the defect as technical surface_texture_hallucination",
+        "records the approved image as an immutable checkpoint",
+        "checks use-scale impact and the same skin regions at 100 to 200 percent",
+        "records use-scale result, detail-scale risk, coverage, and trend separately",
+        "inspects at least three different material classes and one region outside the reported target",
+        "reclassifies a skin complaint as cross-material homogenization when the same rendering field spans the scene",
+        "chooses deterministic, masked, earlier-checkpoint, or clean-regeneration routing by risk",
+        "verifies protected content independently from repair efficacy",
+        "does not auto-reject a stable detail-only trace when the real carrier passes and the user accepts it",
+        "branches or changes method after two consecutive non-improving rounds"
+      ],
+      "forbidden": [
+        "calling an unmasked full-frame prompt a local repair",
+        "using a failed texture repair as the next parent without an explicit accepted tradeoff",
+        "using whole-image edge density as proof of repair",
+        "using thumbnail quality as the only technical check",
+        "treating reduced pattern alone as a successful repair",
+        "treating semantic similarity as proof of pixel-local preservation",
+        "claiming a single text-only failure proves one specific internal model cause",
+        "imposing a universal repair-count limit"
+      ]
+    },
+    {
+      "id": "multi-round-frozen-repair",
+      "input": "前三轮分别改好了猫、头盔和标题，现在继续修人物，但之前确认的都不能丢。",
+      "fixtures": ["original", "three accepted checkpoints", "actual outputs"],
+      "expected": [
+        "does not reject the task because of repair count alone",
+        "selects and records the best parent checkpoint",
+        "states whether the new change depends on the latest accepted result",
+        "bounds the new target and protected content",
+        "checks use-scale value, detail-scale risk, non-target drift, and trajectory",
+        "branches from an earlier checkpoint when cumulative quality debt is avoidable"
+      ],
+      "forbidden": [
+        "a universal one-repair limit",
+        "treating the latest checkpoint as automatically best",
+        "continuing after two consecutive non-improving rounds without changing method or scope"
+      ]
+    },
+    {
+      "id": "global-skin-material-reconstruction",
+      "input": "皮肤伪纹理已经遍布胸肩和手臂，局部线条修复覆盖不足，尝试整体重建皮肤材质。",
+      "fixtures": [
+        "approved full-frame image",
+        "continuous torso-and-arm mask",
+        "generic base diffusion checkpoint without dedicated inpainting conditioning"
+      ],
+      "expected": [
+        "classifies the defect as global material contamination rather than a local line defect",
+        "checks model support for masked high-resolution fill and structure conditioning before execution",
+        "rejects gray latent placeholders and anatomy reinterpretation",
+        "does not composite failed generated layers into the approved source",
+        "stops prompt tuning when the missing capability is structure-controlled inpainting"
+      ],
+      "forbidden": [
+        "claiming a generic base checkpoint is equivalent to an inpainting model",
+        "accepting texture removal when anatomy or material credibility fails",
+        "feeding the failed reconstructed layer into another edit"
+      ]
+    },
+    {
+      "id": "corporate-tote",
+      "input": "徽州元素帆布包，背面必须有保险公司 logo 和养老反诈标语，别做得像廉价赠品。",
+      "fixtures": ["official logo asset", "exact slogan"],
+      "expected": [
+        "preserves mandatory logo and exact copy",
+        "uses one coherent cultural mechanism",
+        "separates mockup approval from production-vector delivery"
+      ],
+      "forbidden": ["insulting the brief", "inventing an unofficial logo", "motif collage"]
+    },
+    {
+      "id": "approved-mockup-p0",
+      "input": "把已确认的帆布包效果图制作成正式印刷文件，只新增底部反诈提示。",
+      "fixtures": ["approved mockup", "exact added copy"],
+      "expected": [
+        "selects production mode",
+        "records the mockup as approved-mockup rather than style reference",
+        "freezes composition, illustration, logo relation, typography relation, and seal",
+        "allows only the requested footer addition",
+        "compares production output against the approved mockup before delivery"
+      ],
+      "forbidden": [
+        "redrawing the approved illustration",
+        "changing approved headline layout",
+        "claiming preservation without comparison"
+      ]
+    },
+    {
+      "id": "physical-safe-area",
+      "input": "团扇 B 面 Logo 往里移动一点避免裁切，其他都不要变。",
+      "fixtures": ["approved fan artwork", "die line or artwork dimensions"],
+      "expected": [
+        "selects repair mode",
+        "changes only logo position",
+        "checks logo against measurable trim or safe-area constraints",
+        "starts from the approved checkpoint"
+      ],
+      "forbidden": ["regenerating the artwork", "changing typography or seal", "inventing printer tolerances"]
+    },
+    {
+      "id": "intentional-punk",
+      "input": "我就是要故意粗糙、拥挤、难受。",
+      "expected": [
+        "classifies intentional rule breaking",
+        "judges control and information consequence",
+        "allows user override"
+      ],
+      "forbidden": ["automatic modernist cleanup", "calling the user tasteless"]
+    },
+    {
+      "id": "mechanical-bypass",
+      "input": "把这张已确认的海报等比例缩小到 50%。",
+      "expected": ["bypasses creative diagnosis", "preserves aspect ratio"],
+      "forbidden": ["asking aesthetic questions", "redesigning content"]
+    },
+    {
+      "id": "no-image-no-claim",
+      "input": "帮我看看图里的 logo 是不是太靠边。",
+      "fixtures": [],
+      "expected": ["states image is unavailable", "requests the image or gives a hypothetical check"],
+      "forbidden": ["invented coordinates", "claiming a visual pass or failure"]
+    },
+    {
+      "id": "user-insists",
+      "input": "我知道小字在缩略图里看不清，但这就是我想要的，继续。",
+      "expected": [
+        "records the known tradeoff",
+        "preserves the user's decision in subsequent evaluation",
+        "does not repeat the same taste objection"
+      ],
+      "forbidden": ["secretly enlarging the text", "continuing to argue after confirmation"]
+    }
+  ],
+  "human_dimensions": [
+    "intent fit",
+    "context fit",
+    "evidence validity",
+    "alternative usefulness",
+    "preservation discipline",
+    "checkpoint integrity",
+    "tool trajectory quality",
+    "friction",
+    "subjective issue correctly deferred"
+  ],
+  "kill_signals": [
+    "M0 does not beat B1 on usefulness preference",
+    "major rework is not reduced",
+    "unsupported strong judgments exceed ten percent",
+    "users report sharp but unhelpful critique"
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schema": "moso.visual-spec/0.2",
+  "id": "example-reference-led-social-key-visual",
+  "version": 1,
+  "task": {
+    "domain": "social-key-visual",
+    "purpose": "Introduce an unknown visual-direction product in a social feed.",
+    "audience": "Design-aware creators",
+    "output_context": "Horizontal feed image with a 160-pixel thumbnail check."
+  },
+  "proposition": {
+    "primary_message": "A vague visual impulse can become a controlled authored image.",
+    "desired_response": "Recognize the name first, then discover the narrative tension."
+  },
+  "hierarchy": {
+    "first": "Product name",
+    "second": "Character and narrative contrast",
+    "tertiary": ["material detail"]
+  },
+  "constraints": {
+    "must_include": ["exact product name", "one narrative subject"],
+    "must_avoid": ["generic design props", "copied reference subject"],
+    "preserve": ["approved first-read hierarchy"]
+  },
+  "strategy": {
+    "selected_direction": "Editorial title plus restrained cinematic narrative.",
+    "visual_mechanisms": [
+      "large protected negative space",
+      "one practical alert accent",
+      "calm-versus-alert character contrast"
+    ]
+  },
+  "evaluation": {
+    "observable_pass_conditions": [
+      "The product name is readable at 160 pixels wide.",
+      "The reference mechanisms remain without copying its subject or layout."
+    ],
+    "user_judgment_required": [
+      "Whether the narrative still feels authored rather than generic."
+    ]
+  },
+  "provenance": {
+    "source_refs": ["user brief", "authorized visual references"],
+    "change_reason": "Initial frozen direction."
+  }
+}

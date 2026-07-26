@@ -1,0 +1,164 @@
+{
+  "schema": "mosocanvas-release-manifest/0.1",
+  "name": "mosocanvas",
+  "version": "0.1.0",
+  "release_date": "2026-07-26",
+  "source": ".agents/skills/mosocanvas",
+  "archive": "mosocanvas-0.1.0.zip",
+  "archive_bytes": 45132,
+  "archive_sha256": "99a42c616e8bbc946dc505c44778f0a018d351268d5dcd97c7debb8254f91aca",
+  "included_file_count": 25,
+  "included_files": [
+    {
+      "path": "mosocanvas/SKILL.md",
+      "bytes": 9631,
+      "sha256": "40be813dca0df2871ac89ce4350eb006af1deb0764633c11e1214d3d8d4d43da"
+    },
+    {
+      "path": "mosocanvas/agents/openai.yaml",
+      "bytes": 304,
+      "sha256": "dc2d7ec816e7b7f841a9138bf102a09e9d33b31d5f9993e80bcaf19f85dfaa07"
+    },
+    {
+      "path": "mosocanvas/evals/evals.json",
+      "bytes": 11214,
+      "sha256": "7a27c72bf220eb04c4c2489a12cc15c4f3f6cec0ce102fdc8b4f67416d4c9d8a"
+    },
+    {
+      "path": "mosocanvas/examples/paired-cases.md",
+      "bytes": 7650,
+      "sha256": "e085abb0e357466abb1d4e876480b616adb309abcf9a5a53c6c435c9e2c1ef1e"
+    },
+    {
+      "path": "mosocanvas/examples/repair-run-state.example.json",
+      "bytes": 1914,
+      "sha256": "f2a21e00f6a81eef73f61422a13716a62d879bb7ec65abb14b18a4903cfa1b46"
+    },
+    {
+      "path": "mosocanvas/examples/run-state.example.json",
+      "bytes": 1631,
+      "sha256": "291c909ec233903a0584daa68bf1cce876b724582ca5ffeb9d9e7832067371a2"
+    },
+    {
+      "path": "mosocanvas/examples/visual-spec.example.json",
+      "bytes": 1624,
+      "sha256": "e721b0a44545c221e61340fd28aae22fd12876418173599d8c259be96b1e64e7"
+    },
+    {
+      "path": "mosocanvas/references/clarification-patterns.md",
+      "bytes": 3230,
+      "sha256": "c65feb185a1465c8312223c10d8f2fd4effc6c574aa6d694c2516c50873643d1"
+    },
+    {
+      "path": "mosocanvas/references/critique-protocol.md",
+      "bytes": 4031,
+      "sha256": "07e6493d69a8b1014e1a13685261c53a1d212e6c148b33fe7eba63274b042b2a"
+    },
+    {
+      "path": "mosocanvas/references/physical-collateral.md",
+      "bytes": 1833,
+      "sha256": "7fe6d4c0b08f73308d57601a8834d2431002748453e28dbebd62b006ffe7498c"
+    },
+    {
+      "path": "mosocanvas/references/preservation-and-repair.md",
+      "bytes": 4965,
+      "sha256": "52fb6d2c0b0f1d3140215684e1e2435b016e3c1efd31d18f82c6b4092f371ae7"
+    },
+    {
+      "path": "mosocanvas/references/reference-deconstruction.md",
+      "bytes": 3695,
+      "sha256": "be773ec591968a87fe64d6bfa861f67e073ecd9e8c7fe1a4427f730285b383d2"
+    },
+    {
+      "path": "mosocanvas/references/social-key-visual.md",
+      "bytes": 3919,
+      "sha256": "db81118dffb6af8e7109669d44e04f30168e9ef1fcd23df98bf774b7fbe372e7"
+    },
+    {
+      "path": "mosocanvas/references/texture-integrity.md",
+      "bytes": 5265,
+      "sha256": "74a49e623ddb8d3b665c6dc61fc0d71a7415fac6c6fafb84ff72f0d8b89effe6"
+    },
+    {
+      "path": "mosocanvas/schemas/critique.schema.json",
+      "bytes": 2843,
+      "sha256": "a7e9e68365fd9b6980fd98bb8159a245ed830c250d81b07f77e0c38e0d549abc"
+    },
+    {
+      "path": "mosocanvas/schemas/reference-analysis.schema.json",
+      "bytes": 3785,
+      "sha256": "9e2297256098a6a99d82f2e8b4f154eb9b3c9f5682df2200d23937e51aceabe5"
+    },
+    {
+      "path": "mosocanvas/schemas/run-state.schema.json",
+      "bytes": 5830,
+      "sha256": "94276aaa519146d836dc5a8c86cc4ac0ade79ea8234286f2326ae7075d2d3838"
+    },
+    {
+      "path": "mosocanvas/schemas/visual-spec.schema.json",
+      "bytes": 7938,
+      "sha256": "c2a29713ee6f3571bd5a61d28a480438a89d9f5fd538b6c0e26d58c54a4edf24"
+    },
+    {
+      "path": "mosocanvas/scripts/analyze_reference.py",
+      "bytes": 6426,
+      "sha256": "c30e38251db85173a68f955995d3f6847c46db648c0558161ccaf5ba9cb3f8da"
+    },
+    {
+      "path": "mosocanvas/scripts/build_asset_manifest.py",
+      "bytes": 2848,
+      "sha256": "087c92101c2e069036b236b4d7f80d167051e7cbee22158fa1e3468da51ea8f0"
+    },
+    {
+      "path": "mosocanvas/scripts/build_region_mask.py",
+      "bytes": 4012,
+      "sha256": "ddba888e7ae11d16419cbe4b8d495dcb4b02a066f1fd634451368949e12ba306"
+    },
+    {
+      "path": "mosocanvas/scripts/composite_region.py",
+      "bytes": 1310,
+      "sha256": "788b98eb09784690ce8b04714adb7eb7df980994f3b723028a12dca610b3a49f"
+    },
+    {
+      "path": "mosocanvas/scripts/preflight_validate.py",
+      "bytes": 4055,
+      "sha256": "53387f42663a43e9bf90de7cb504b054ff1fda68256a43dbe8a49a88906c9d82"
+    },
+    {
+      "path": "mosocanvas/scripts/refine_mask.py",
+      "bytes": 2565,
+      "sha256": "7e6915d4771daa2989b41931cfcca85eed5278741c2ab2d171c4ca380ad99fbc"
+    },
+    {
+      "path": "mosocanvas/scripts/verify_mask_preservation.py",
+      "bytes": 2656,
+      "sha256": "575b4c9eaf3f0d00392072eb4daecabff8b42d3581b81051065dbbafb5d4e79e"
+    }
+  ],
+  "excluded_from_release": [
+    "experiments/texture-repair/**",
+    "**/__pycache__/**",
+    "**/*.pyc",
+    "project output and source imagery"
+  ],
+  "validation": {
+    "skill_structure": "pass",
+    "json_parse": "pass",
+    "json_schema_examples": "pass",
+    "openai_yaml": "pass",
+    "python_compile": "pass",
+    "script_help_smoke": "pass",
+    "production_preflight_example": "pass",
+    "repair_preflight_example": "pass",
+    "core_image_script_smoke": "pass",
+    "masked_composite_preservation": "pass",
+    "local_markdown_links": "pass",
+    "benchmark_case_count": 17
+  },
+  "known_limits": [
+    "Visual quality still depends on the host model and available visual tools.",
+    "MoSoCanvas plans and verifies local repair but cannot guarantee every image backend preserves pixels.",
+    "Automatic line-network texture removal remains experimental and is not included in v0.1.0.",
+    "No interactive canvas, persistent user taste profile, or universal aesthetic score is included."
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "MoSoCanvas"
+  short_description: "解构视觉参考、冻结设计决策、受控修复并审查真实视觉输出"
+  default_prompt: "Use $mosocanvas to deconstruct my visual references, freeze the design contract, execute with available tools, and verify the real output."

@@ -1,0 +1,70 @@
+{
+  "schema": "moso.run-state/0.2",
+  "task_id": "example-multi-round-repair",
+  "mode": "repair",
+  "phase": "preflight",
+  "spec_ref": "moso.visual-spec/example/3",
+  "approved_checkpoint": {
+    "source_ref": "codex://artifact/approved-v3",
+    "role": "approved-output",
+    "width_px": 1536,
+    "height_px": 1024,
+    "user_confirmed_at": "2026-07-26T00:00:00Z"
+  },
+  "lineage": {
+    "parent_ref": "codex://artifact/approved-v3",
+    "operation": "masked-generative",
+    "depends_on_parent": true,
+    "branch_reason": "The next repair depends on the accepted cat and helmet changes in v3."
+  },
+  "allowed_changes": [
+    "skin material inside the reviewed torso mask"
+  ],
+  "protected_elements": [
+    "face and identity",
+    "hands and pose",
+    "cat, helmet, wordmark, background, and output dimensions"
+  ],
+  "attempt_budget": {
+    "generative": 0,
+    "repair": 2,
+    "generative_used": 0,
+    "repair_used": 0
+  },
+  "output_requirements": {
+    "carrier": "horizontal social key visual",
+    "formats": ["PNG"],
+    "width": 1536,
+    "height": 1024,
+    "unit": "px"
+  },
+  "verification": [
+    {
+      "check": "skin works at feed and detail scale",
+      "method": "matched use-scale and 200-percent crops",
+      "status": "pending"
+    },
+    {
+      "check": "protected content remains within tolerance",
+      "method": "outside-mask pixel check plus visual identity review",
+      "status": "pending"
+    }
+  ],
+  "quality_status": {
+    "use_scale": "pending",
+    "detail_scale": "pending",
+    "protected_drift": "pending",
+    "trend": "pending",
+    "user_acceptance": "pending"
+  },
+  "approval_status": "approved",
+  "artifact_versions": [
+    {
+      "version": "v3",
+      "source_ref": "codex://artifact/approved-v3",
+      "parent": "codex://artifact/approved-v2",
+      "status": "approved",
+      "change_reason": "User accepted the cat and helmet repair."
+    }
+  ]
+}

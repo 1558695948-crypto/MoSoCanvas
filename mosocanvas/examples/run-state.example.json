@@ -1,0 +1,64 @@
+{
+  "schema": "moso.run-state/0.2",
+  "task_id": "example-approved-mockup-production",
+  "mode": "production",
+  "phase": "preflight",
+  "spec_ref": "moso.visual-spec/example/2",
+  "approved_checkpoint": {
+    "source_ref": "codex://artifact/approved-mockup",
+    "role": "approved-mockup",
+    "width_px": 1536,
+    "height_px": 1024,
+    "user_confirmed_at": "2026-07-23T00:00:00Z"
+  },
+  "allowed_changes": [
+    "add the confirmed footer inside the defined safe area"
+  ],
+  "protected_elements": [
+    "front illustration geometry",
+    "headline line count and alignment",
+    "logo and seal relationships"
+  ],
+  "required_assets": [
+    {
+      "role": "official logo",
+      "source_ref": "codex://artifact/official-logo",
+      "status": "authoritative"
+    }
+  ],
+  "attempt_budget": {
+    "generative": 0,
+    "repair": 1,
+    "generative_used": 0,
+    "repair_used": 0
+  },
+  "output_requirements": {
+    "carrier": "canvas tote",
+    "formats": ["PDF", "JPG", "SVG"],
+    "width": 280,
+    "height": 350,
+    "unit": "mm",
+    "dpi": 300
+  },
+  "verification": [
+    {
+      "check": "approved relationships are unchanged",
+      "method": "overlay comparison against approved mockup",
+      "status": "pending"
+    },
+    {
+      "check": "physical size and required copy are exact",
+      "method": "PDF metadata and text extraction",
+      "status": "pending"
+    }
+  ],
+  "quality_status": {
+    "use_scale": "pending",
+    "detail_scale": "not-required",
+    "protected_drift": "pending",
+    "trend": "pending",
+    "user_acceptance": "pending"
+  },
+  "approval_status": "approved",
+  "artifact_versions": []
+}
