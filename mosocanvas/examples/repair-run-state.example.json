@@ -1,5 +1,5 @@
 {
-  "schema": "moso.run-state/0.2",
+  "schema": "moso.run-state/0.4",
   "task_id": "example-multi-round-repair",
   "mode": "repair",
   "phase": "preflight",
@@ -15,16 +15,10 @@
     "parent_ref": "codex://artifact/approved-v3",
     "operation": "masked-generative",
     "depends_on_parent": true,
-    "branch_reason": "The next repair depends on the accepted cat and helmet changes in v3."
+    "branch_reason": "The next repair depends on accepted changes in v3."
   },
-  "allowed_changes": [
-    "skin material inside the reviewed torso mask"
-  ],
-  "protected_elements": [
-    "face and identity",
-    "hands and pose",
-    "cat, helmet, wordmark, background, and output dimensions"
-  ],
+  "allowed_changes": ["skin material inside the reviewed torso mask"],
+  "protected_elements": ["face", "hands", "pose", "cat", "helmet", "wordmark", "background", "dimensions"],
   "attempt_budget": {
     "generative": 0,
     "repair": 2,
@@ -36,35 +30,38 @@
     "formats": ["PNG"],
     "width": 1536,
     "height": 1024,
-    "unit": "px"
+    "unit": "px",
+    "frame_count": 1
   },
   "verification": [
-    {
-      "check": "skin works at feed and detail scale",
-      "method": "matched use-scale and 200-percent crops",
-      "status": "pending"
-    },
-    {
-      "check": "protected content remains within tolerance",
-      "method": "outside-mask pixel check plus visual identity review",
-      "status": "pending"
-    }
+    {"check": "skin works at feed and detail scale", "method": "use-scale and 200-percent crops", "status": "pending"},
+    {"check": "protected content remains stable", "method": "outside-mask pixel check plus identity review", "status": "pending"}
   ],
+  "direction_approval_status": "approved",
   "quality_status": {
     "use_scale": "pending",
     "detail_scale": "pending",
     "protected_drift": "pending",
-    "trend": "pending",
+    "trajectory": "pending",
+    "independent_review": "pending",
     "user_acceptance": "pending"
   },
-  "approval_status": "approved",
-  "artifact_versions": [
+  "generation_attempts": [
     {
-      "version": "v3",
-      "source_ref": "codex://artifact/approved-v3",
-      "parent": "codex://artifact/approved-v2",
-      "status": "approved",
-      "change_reason": "User accepted the cat and helmet repair."
+      "attempt_id": "repair-v4-a1",
+      "status": "planned",
+      "pre_generation_brief": {
+        "objective": "Remove synthetic skin pattern without changing identity or pose.",
+        "viewer_position": "unchanged from the approved checkpoint",
+        "first_read": "the accepted seated figure remains dominant",
+        "composition_geometry": "immutable full-frame composition; edit only the reviewed torso mask",
+        "narrative_beat": "unchanged",
+        "color_light_logic": "preserve existing directional monochrome light",
+        "required_content": ["accepted figure", "cat", "helmet", "wordmark", "background"],
+        "protected_content": ["face", "hands", "anatomy", "pose", "all out-of-mask pixels"],
+        "main_risk": "The repair may reinterpret anatomy or spread texture outside the mask.",
+        "communicated_to_user": true
+      }
     }
   ]
 }

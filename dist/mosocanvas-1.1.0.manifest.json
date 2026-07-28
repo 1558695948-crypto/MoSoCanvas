@@ -1,0 +1,308 @@
+{
+  "schema": "mosocanvas-release-manifest/0.2",
+  "name": "mosocanvas",
+  "version": "1.1.0",
+  "release_date": "2026-07-28",
+  "source": "mosocanvas",
+  "archive": "mosocanvas-1.1.0.zip",
+  "archive_bytes": 106942,
+  "archive_sha256": "cf9c53e1c08ec145dd9bd47d0903e66b561636d0f87b40af040a7e6f467ed83a",
+  "included_file_count": 59,
+  "included_files": [
+    {
+      "path": "mosocanvas/SKILL.md",
+      "bytes": 12446,
+      "sha256": "f5b979547b2c3d725fb5531e7461c4722873bed2fcfc50b67e6dc98e15f20820"
+    },
+    {
+      "path": "mosocanvas/VERSION",
+      "bytes": 6,
+      "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
+    },
+    {
+      "path": "mosocanvas/agents/openai.yaml",
+      "bytes": 437,
+      "sha256": "da5c10284638baee04b000aebcb89d1a66018192851b1b4c6753c4fa4e0be3fd"
+    },
+    {
+      "path": "mosocanvas/evals/evals.json",
+      "bytes": 20332,
+      "sha256": "4ec8d7fabefc4543839651024acbf1d9b69f73335292285889b3f66cb6b4de72"
+    },
+    {
+      "path": "mosocanvas/examples/artifact-review.example.json",
+      "bytes": 1183,
+      "sha256": "7de3203e2d5fe8b70a97fdd761548b3872d8e49cd479ff1482370a904bf19170"
+    },
+    {
+      "path": "mosocanvas/examples/paired-cases.md",
+      "bytes": 7650,
+      "sha256": "e085abb0e357466abb1d4e876480b616adb309abcf9a5a53c6c435c9e2c1ef1e"
+    },
+    {
+      "path": "mosocanvas/examples/repair-run-state.example.json",
+      "bytes": 2508,
+      "sha256": "0e717988966a55f95b6ed200c4579ce34b104a427906d495aab014cbbdca6ad4"
+    },
+    {
+      "path": "mosocanvas/examples/run-state.example.json",
+      "bytes": 2466,
+      "sha256": "6dc5f483efa4a72bb18a8a4c4baf37604051b8c27f2d4f538ca2328cfa604ff6"
+    },
+    {
+      "path": "mosocanvas/examples/series-plan.example.json",
+      "bytes": 4653,
+      "sha256": "f0846689bbb2c8e0cd0dd92100b1aa5457bbfbaca7654d3645e376df090ad43d"
+    },
+    {
+      "path": "mosocanvas/examples/shot-plan.example.json",
+      "bytes": 4747,
+      "sha256": "47481702b30df32444f597ed2d2fdf756fda8b76bb90f42041c562c891b99682"
+    },
+    {
+      "path": "mosocanvas/examples/visual-spec.example.json",
+      "bytes": 3277,
+      "sha256": "0d0757771d2e404d30d019e2dd65700ade291847946f26e4cf094f3284aa8235"
+    },
+    {
+      "path": "mosocanvas/references/aesthetic-radar.md",
+      "bytes": 3680,
+      "sha256": "9a24ff08e337e4adad37cfd8c1abf9aadb4b3317f3d35b252c8318e12728e665"
+    },
+    {
+      "path": "mosocanvas/references/clarification-patterns.md",
+      "bytes": 3230,
+      "sha256": "c65feb185a1465c8312223c10d8f2fd4effc6c574aa6d694c2516c50873643d1"
+    },
+    {
+      "path": "mosocanvas/references/color-and-light-script.md",
+      "bytes": 1963,
+      "sha256": "7c811816fe86d1a316e1e3923ef38e8dc57af2e9acd5a97255962b885973ff32"
+    },
+    {
+      "path": "mosocanvas/references/critique-protocol.md",
+      "bytes": 4031,
+      "sha256": "07e6493d69a8b1014e1a13685261c53a1d212e6c148b33fe7eba63274b042b2a"
+    },
+    {
+      "path": "mosocanvas/references/evidence-foundations.md",
+      "bytes": 3957,
+      "sha256": "ac1507a9ec2554baa0a852f57de82106faa80500913cef47ca4f5419a3526b09"
+    },
+    {
+      "path": "mosocanvas/references/generated-image-authenticity.md",
+      "bytes": 2273,
+      "sha256": "9cdea6c033ff9bc38371f3cb413f10b38cc97c6014f72b25383272cde47a400c"
+    },
+    {
+      "path": "mosocanvas/references/midjourney-quality-benchmark.md",
+      "bytes": 3985,
+      "sha256": "6853ce0b49fbeed3bba3a0fe9c95abd887b3b815bbc5c14e6795e89762af1bb0"
+    },
+    {
+      "path": "mosocanvas/references/physical-collateral.md",
+      "bytes": 1833,
+      "sha256": "7fe6d4c0b08f73308d57601a8834d2431002748453e28dbebd62b006ffe7498c"
+    },
+    {
+      "path": "mosocanvas/references/preservation-and-repair.md",
+      "bytes": 4965,
+      "sha256": "52fb6d2c0b0f1d3140215684e1e2435b016e3c1efd31d18f82c6b4092f371ae7"
+    },
+    {
+      "path": "mosocanvas/references/reference-deconstruction.md",
+      "bytes": 3695,
+      "sha256": "be773ec591968a87fe64d6bfa861f67e073ecd9e8c7fe1a4427f730285b383d2"
+    },
+    {
+      "path": "mosocanvas/references/shot-composition-grammar.md",
+      "bytes": 2778,
+      "sha256": "aef48ac62af74fa0d88f08ba9523c49c1951a09532c9ff85214a3d81618d3a13"
+    },
+    {
+      "path": "mosocanvas/references/social-key-visual.md",
+      "bytes": 3919,
+      "sha256": "db81118dffb6af8e7109669d44e04f30168e9ef1fcd23df98bf774b7fbe372e7"
+    },
+    {
+      "path": "mosocanvas/references/texture-integrity.md",
+      "bytes": 5265,
+      "sha256": "74a49e623ddb8d3b665c6dc61fc0d71a7415fac6c6fafb84ff72f0d8b89effe6"
+    },
+    {
+      "path": "mosocanvas/references/visual-narrative.md",
+      "bytes": 1867,
+      "sha256": "86f1ccea3fe92acb3a9b33055d2f392c165963302d311965b65a183982886670"
+    },
+    {
+      "path": "mosocanvas/references/zero-reference-direction.md",
+      "bytes": 2628,
+      "sha256": "2ed7db7e9da8604c010c34b5357362be6f0ee1dcbb45f370fd7ec7878206c089"
+    },
+    {
+      "path": "mosocanvas/requirements-dev.txt",
+      "bytes": 33,
+      "sha256": "690fa118aea56dbe98f14d55e337745992cdf8f3a95b7324396ae0048c94246b"
+    },
+    {
+      "path": "mosocanvas/schemas/artifact-review.schema.json",
+      "bytes": 5209,
+      "sha256": "5430ad99d6a5ae8d474ca32704fad5433cea5a0080e12b3aabd11a56af477ebc"
+    },
+    {
+      "path": "mosocanvas/schemas/benchmark-suite.schema.json",
+      "bytes": 3970,
+      "sha256": "71acb8fc74a37814bfac7dc286658e0bdb90ee93caa374cd033054bf6abd3c61"
+    },
+    {
+      "path": "mosocanvas/schemas/critique.schema.json",
+      "bytes": 2843,
+      "sha256": "a7e9e68365fd9b6980fd98bb8159a245ed830c250d81b07f77e0c38e0d549abc"
+    },
+    {
+      "path": "mosocanvas/schemas/evidence-registry.schema.json",
+      "bytes": 1879,
+      "sha256": "c6d44a704574ea2b5271a4baa6de773d8b88103a10c26847d9045c6eacf70709"
+    },
+    {
+      "path": "mosocanvas/schemas/pairwise-evaluation.schema.json",
+      "bytes": 4850,
+      "sha256": "4b3747f1bc05b4239b9391c9c3778cdcbd5849923ebd80854b02e7b4812241cb"
+    },
+    {
+      "path": "mosocanvas/schemas/reference-analysis.schema.json",
+      "bytes": 3785,
+      "sha256": "9e2297256098a6a99d82f2e8b4f154eb9b3c9f5682df2200d23937e51aceabe5"
+    },
+    {
+      "path": "mosocanvas/schemas/review-session.schema.json",
+      "bytes": 1083,
+      "sha256": "e3ed2dcac76b642c380b1795fecd2938cd1d1565df3af1d8feaa4a7cd215c594"
+    },
+    {
+      "path": "mosocanvas/schemas/run-state.schema.json",
+      "bytes": 10410,
+      "sha256": "f10269600c72ad4d281af21decb8dab081e9e587e4b3d917c16a188d6d4ef6aa"
+    },
+    {
+      "path": "mosocanvas/schemas/series-plan.schema.json",
+      "bytes": 3434,
+      "sha256": "65cf57b5723214daa43e9ae5860d2d656b465cdb4b4430cec29a2144effec9ee"
+    },
+    {
+      "path": "mosocanvas/schemas/shot-plan.schema.json",
+      "bytes": 5255,
+      "sha256": "6df491c5dbe700efd514fa83e43d5f3ad7fcbba65f9505de0643d2a3d1913151"
+    },
+    {
+      "path": "mosocanvas/schemas/trend-snapshot.schema.json",
+      "bytes": 6077,
+      "sha256": "0440ae548d2340e8ce9a00582c91ab88ee19acd85baeec0c3307cbc056136748"
+    },
+    {
+      "path": "mosocanvas/schemas/user-decision.schema.json",
+      "bytes": 1097,
+      "sha256": "11ca9797e38268b3d5c1bce44cc850ed4da9184f9da888413cab6d6022eac7b5"
+    },
+    {
+      "path": "mosocanvas/schemas/visual-spec.schema.json",
+      "bytes": 6598,
+      "sha256": "4e971b79201f94f372b9a3227a896efe18fabb4e3cfc96db8f29d9c06195f3a4"
+    },
+    {
+      "path": "mosocanvas/scripts/analyze_reference.py",
+      "bytes": 6426,
+      "sha256": "c30e38251db85173a68f955995d3f6847c46db648c0558161ccaf5ba9cb3f8da"
+    },
+    {
+      "path": "mosocanvas/scripts/benchmark_score.py",
+      "bytes": 14637,
+      "sha256": "4fabe1c45a0db7627b3e518751de0288515cbc505e60d5894c62edb15453bcec"
+    },
+    {
+      "path": "mosocanvas/scripts/build_asset_manifest.py",
+      "bytes": 2848,
+      "sha256": "087c92101c2e069036b236b4d7f80d167051e7cbee22158fa1e3468da51ea8f0"
+    },
+    {
+      "path": "mosocanvas/scripts/build_blind_review_packet.py",
+      "bytes": 2121,
+      "sha256": "c085e776f9a73edc6015b42f56547a69dfc9636b7ccfcd715273677ba7213fd9"
+    },
+    {
+      "path": "mosocanvas/scripts/build_region_mask.py",
+      "bytes": 4012,
+      "sha256": "ddba888e7ae11d16419cbe4b8d495dcb4b02a066f1fd634451368949e12ba306"
+    },
+    {
+      "path": "mosocanvas/scripts/build_series_contact_sheet.py",
+      "bytes": 2146,
+      "sha256": "2938fa230e9aff73f36cfb2ae56d73938e321cac855e4273c9d7308c99f006e8"
+    },
+    {
+      "path": "mosocanvas/scripts/composite_region.py",
+      "bytes": 1310,
+      "sha256": "788b98eb09784690ce8b04714adb7eb7df980994f3b723028a12dca610b3a49f"
+    },
+    {
+      "path": "mosocanvas/scripts/evidence.py",
+      "bytes": 3742,
+      "sha256": "675db8bb280c94fb0cebd4f5e115b64893d47de826fb2f2595afe40c43f30e9a"
+    },
+    {
+      "path": "mosocanvas/scripts/evidence_validate.py",
+      "bytes": 1227,
+      "sha256": "52998ae25a5ebd4a1a385582014e3b8a1e3390ea70895316610e939f4201d3d0"
+    },
+    {
+      "path": "mosocanvas/scripts/package_release.py",
+      "bytes": 3067,
+      "sha256": "c27b153a328a6ea565754a628cb41391e75335861286c28a6193f083dbb8f140"
+    },
+    {
+      "path": "mosocanvas/scripts/preflight_validate.py",
+      "bytes": 20695,
+      "sha256": "a36f100fba9d6ddb48efe5ae694e43096b92e9796db231a7817d4872ce68f6f9"
+    },
+    {
+      "path": "mosocanvas/scripts/refine_mask.py",
+      "bytes": 2565,
+      "sha256": "7e6915d4771daa2989b41931cfcca85eed5278741c2ab2d171c4ca380ad99fbc"
+    },
+    {
+      "path": "mosocanvas/scripts/review_integrity.py",
+      "bytes": 6461,
+      "sha256": "98a08ebb2cda002d04b96106c5195cf3b1672955da425d82ebf4aed42b5f36f7"
+    },
+    {
+      "path": "mosocanvas/scripts/review_validate.py",
+      "bytes": 5577,
+      "sha256": "31715b87b4e8d0dbb35889f3edc846f65c6aa2b61de06f79c8c199cacfd9da70"
+    },
+    {
+      "path": "mosocanvas/scripts/run_tests.py",
+      "bytes": 501,
+      "sha256": "aeeac1e6f11fca1ef64e251ce5752340025a2d5b18af994b13b7556d4c297607"
+    },
+    {
+      "path": "mosocanvas/scripts/self_check.py",
+      "bytes": 7511,
+      "sha256": "2a0048ce96c341f9998b7187eac0c400abffb00c6de1a8641d690549e121d20b"
+    },
+    {
+      "path": "mosocanvas/scripts/trend_validate.py",
+      "bytes": 9376,
+      "sha256": "a487700e379ed13ba28d17aba9201b687e939544b05c4a0dfd47f8ffe2edce9d"
+    },
+    {
+      "path": "mosocanvas/scripts/verify_mask_preservation.py",
+      "bytes": 2656,
+      "sha256": "575b4c9eaf3f0d00392072eb4daecabff8b42d3581b81051065dbbafb5d4e79e"
+    },
+    {
+      "path": "mosocanvas/tests/test_integrity.py",
+      "bytes": 26026,
+      "sha256": "d570117a74b33c8759c452d53f074330d6855ef3569833b302fadda0979a07cd"
+    }
+  ]
+}

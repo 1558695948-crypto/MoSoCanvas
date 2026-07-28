@@ -1,8 +1,42 @@
 {
-  "suite": "mosocanvas-v0.1.0",
+  "suite": "mosocanvas-v1.1.0",
   "scope": "campaign key visuals, posters, and physical promotional collateral",
   "conditions": ["B0-direct", "B1-generic-clarify-first", "M0-mosocanvas"],
   "cases": [
+    {
+      "id": "generation-bookends",
+      "input": "用这张参考图的视觉机制生成一张横版 MoSoCanvas 宣传图。",
+      "fixtures": ["one visual reference", "generated output returned by an image tool"],
+      "expected": [
+        "before the image tool call, communicates a concise design brief covering objective, first read, composition, visual mechanisms, required and protected content, and main risk",
+        "does not substitute raw prompt text for the design brief",
+        "after the image tool call, inspects the actual image rather than the intended prompt",
+        "reports visible strengths, deviations, technical risks, and one prioritized improvement",
+        "recommends accept, local repair, regenerate, or user judgment before another generation",
+        "does not force an extra confirmation when the brief contains no unresolved material choice"
+      ],
+      "forbidden": [
+        "calling the image tool before communicating the design brief",
+        "handing off a generated image without critique",
+        "starting another generation before reviewing the previous output",
+        "inventing a review when the output cannot be inspected"
+      ]
+    },
+    {
+      "id": "batch-generation-bookends",
+      "input": "一次给我生成三版不同方向的宣传图。",
+      "fixtures": ["three generated outputs returned in one tool call"],
+      "expected": [
+        "before generation, identifies the intended visual difference of all three candidates",
+        "after generation, inspects all three actual images separately",
+        "does not use one generic compliment or defect statement for the batch",
+        "compares candidates against the same frozen purpose and carrier"
+      ],
+      "forbidden": [
+        "leaving any returned image unreviewed",
+        "inventing candidate differences only after seeing the outputs"
+      ]
+    },
     {
       "id": "clarify-advanced",
       "input": "做一张高级的新品宣传图。",
@@ -215,6 +249,159 @@
       "fixtures": [],
       "expected": ["states image is unavailable", "requests the image or gives a hypothetical check"],
       "forbidden": ["invented coordinates", "claiming a visual pass or failure"]
+    },
+    {
+      "id": "zero-reference-structural-directions",
+      "input": "没有参考图。做一组人类不断向 AI 索取答案、却逐渐发现自己一直被观察的 7 张图。",
+      "expected": [
+        "defines proposition, viewer position, information power, first read, second read, and residual question",
+        "proposes at least three directions with different spatial logic before trend lookup",
+        "varies viewpoint, scale relation, and narrative time rather than palette alone",
+        "names generic AI symbolism as a failure risk"
+      ],
+      "forbidden": [
+        "starting from a prompt full of style adjectives",
+        "seven centered variations of one entity",
+        "using trend examples before native ideation"
+      ]
+    },
+    {
+      "id": "composition-proof-before-generation",
+      "input": "方向不错，直接出大图吧。",
+      "fixtures": ["zero-reference direction selected", "no composition proof"],
+      "expected": [
+        "creates or requests a monochrome value thumbnail or mass map before full-resolution generation",
+        "records viewpoint, mass relation, negative-space owner, vectors, crop pressure, and carrier safe zones",
+        "tests the first read at feed thumbnail scale"
+      ],
+      "forbidden": [
+        "crossing composition proof with prose alone",
+        "claiming color or detail can rescue unresolved mass hierarchy"
+      ]
+    },
+    {
+      "id": "series-rhythm-not-duplicates",
+      "input": "把确认的第一张扩展成剩余六张，保持统一。",
+      "fixtures": ["approved pilot", "seven-frame series brief"],
+      "expected": [
+        "freezes recurring subject, material, palette, and carrier invariants",
+        "assigns every frame a distinct narrative job and new information",
+        "varies at least two structural dimensions across the series",
+        "uses an ordered contact sheet to review rhythm and redundancy"
+      ],
+      "forbidden": [
+        "treating the same shot with new props as series design",
+        "expanding without approved pilot review",
+        "using one seed as proof of narrative consistency"
+      ]
+    },
+    {
+      "id": "color-script-evidence",
+      "input": "七张都要色彩极其考究。",
+      "expected": [
+        "defines value key, dominant hue family, accent ownership, contrast locus, and motivated light per frame",
+        "checks grayscale hierarchy before fine grading",
+        "designs controlled bridges or ruptures between adjacent frames",
+        "states color mechanisms contextually rather than as universal psychology"
+      ],
+      "forbidden": [
+        "seven unrelated attractive palettes",
+        "unmotivated teal-orange grading",
+        "claiming one hue universally creates fear or intelligence"
+      ]
+    },
+    {
+      "id": "midjourney-as-quality-target",
+      "input": "我们不是要接入 Midjourney，而是要让 MoSoCanvas 的结果达到甚至超过它。",
+      "expected": [
+        "treats Midjourney as a dated external quality benchmark rather than a backend or prompt dialect",
+        "keeps target images hidden until MoSoCanvas outputs are frozen",
+        "defines curated-ceiling and matched-challenge benchmark lanes separately",
+        "uses anonymous pairwise preference plus craft and defect dimensions"
+      ],
+      "forbidden": [
+        "writing Midjourney parameters or an adapter",
+        "using Midjourney images as generation references",
+        "claiming superiority from one image or a self-score"
+      ]
+    },
+    {
+      "id": "midjourney-exceeds-claim-integrity",
+      "input": "这张图看起来比 Midjourney 好，可以宣布我们超过它了吗？",
+      "fixtures": ["one MoSoCanvas image", "one unblinded Midjourney image"],
+      "expected": [
+        "rejects a superiority claim from one unmatched comparison",
+        "requires a predeclared matched multi-task benchmark with randomized blind sides",
+        "requires independent raters, hard-defect parity, and confidence bounds",
+        "reports task-level results so category failures are not hidden by an average"
+      ],
+      "forbidden": [
+        "announcing exceeds from subjective confidence",
+        "using an unblinded average score",
+        "changing the threshold after seeing results"
+      ]
+    },
+    {
+      "id": "independent-review-no-self-approval",
+      "input": "图已经生成了，你自己看着不错就直接通过吧。",
+      "fixtures": ["generated artifact", "generator self-review only"],
+      "expected": [
+        "inspects the actual artifact but labels the same-context review assistive",
+        "builds a prompt-blind review pass",
+        "requires independent review evidence before release authorization",
+        "keeps user acceptance separate from direction approval"
+      ],
+      "forbidden": [
+        "generator directly authorizing its own output",
+        "phase accept while user acceptance is pending",
+        "treating inspected_actual_output true as visual proof"
+      ]
+    },
+    {
+      "id": "ai-residue-specific-diagnosis",
+      "input": "这张图看起来很 AI，具体哪里有问题？",
+      "fixtures": ["generated kitchen scene with hand, reflection, and object-state inconsistencies"],
+      "expected": [
+        "names evidence regions and failure classes instead of using looks-AI as the conclusion",
+        "checks physical continuity, reflections, object states, anatomy, and cross-material texture",
+        "distinguishes use-scale impact from detail-scale risk",
+        "proposes structural or bounded repairs based on the defect class"
+      ],
+      "forbidden": [
+        "generic recommendation to add grain",
+        "accepting atmosphere while physical contradictions remain",
+        "inventing invisible model causes"
+      ]
+    },
+    {
+      "id": "trend-snapshot-freshness",
+      "input": "参考今天互联网设计圈最火的视觉做法，但不要变成跟风。",
+      "expected": [
+        "creates native directions before consulting trend evidence",
+        "requires time-stamped multi-source signals with expiry and limitations",
+        "keeps velocity, curation, recurrence, novelty, relevance, and saturation separate",
+        "transfers mechanisms and records literal-copy risks"
+      ],
+      "forbidden": [
+        "calling one viral post a trend",
+        "using a stale snapshot as today's evidence",
+        "collapsing all evidence into one hotness score"
+      ]
+    },
+    {
+      "id": "legacy-false-acceptance",
+      "input": "检查这个旧 run-state：phase 是 accept，但 user_acceptance 仍是 pending，而且只有生成者自己的 post_generation_review。",
+      "fixtures": ["moso.run-state/0.3 legacy state"],
+      "expected": [
+        "blocks acceptance and requires migration to run-state 0.4",
+        "requires actual user acceptance",
+        "requires an independent artifact review reference",
+        "states that structural validation does not prove aesthetic quality"
+      ],
+      "forbidden": [
+        "passing because approval_status is approved",
+        "passing because inspected_actual_output is true"
+      ]
     },
     {
       "id": "user-insists",
