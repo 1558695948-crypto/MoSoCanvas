@@ -19,7 +19,7 @@ MoSoCanvas turns vague visual requests and reference images into a controlled pr
 - `mosocanvas/scripts/` — deterministic inspection, masking, compositing, and preservation helpers;
 - `mosocanvas/examples/` — example specs and calibrated cases;
 - `mosocanvas/evals/` — clean-context regression evaluations;
-- `dist/` — the packaged v0.1.0 release and integrity manifest.
+- `dist/` — packaged releases and integrity manifests; v1.1.0 is current.
 
 ## Design principle
 
@@ -27,7 +27,6 @@ MoSoCanvas does not try to replace taste with a universal score. It makes visual
 
 ## Status
 
-Version `0.1.0`.
+Current version: `1.1.0`.
 
 This repository is public for viewing and evaluation. It is not an open-source grant. See [LICENSE](LICENSE).
-

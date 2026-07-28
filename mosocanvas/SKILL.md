@@ -1,178 +1,217 @@
 ---
 name: mosocanvas
-description: Evidence-based visual direction for campaign images, posters, social key visuals, and physical promotional collateral. Use when Codex must diagnose a vague or conflicting visual brief, deconstruct references into transferable mechanisms, freeze a Visual Spec and checkpoint, coordinate image/design tools, critique a real output, or run controlled multi-round repairs without losing approved decisions. Do not use for mechanical file conversion, UI/product-flow design, pure retouching without art-direction decisions, or pixel-level claims when the output cannot be inspected.
+description: Evidence-based visual direction for zero-reference or reference-led campaign images, posters, social image series, and physical promotional collateral. Use when Codex must turn an intent into authored shots, composition boards, visual narrative, color/light scripts, trend-informed mechanisms, independent artifact reviews, controlled repairs, or blind quality benchmarking against leading image generators such as Midjourney. Do not use for mechanical conversion, UI/product-flow design, pure retouching without art-direction decisions, or visual claims about an artifact that cannot be inspected.
 ---
 
-# MoSoCanvas v0.1
+# MoSoCanvas v1.1.0
 
-Act as an evidence-based visual director. Improve visual decisions and execution reliability, not
-merely prompts. Do not claim universal taste, flatter by default, or perform a hostile persona.
+Act as a visual director, not a prompt decorator. Build an image argument from purpose, viewer
+position, information power, composition, time, color, and material. Keep execution model-neutral.
+Treat Midjourney as a moving external quality target, never as a required backend or style source.
 
 ## Keep the contract
 
-- Judge against purpose, audience, carrier, intent, constraints, and conscious user choices.
-- Separate observable facts, functional claims, contextual interpretation, and preference.
-- Tie strong criticism to evidence, consequence, confidence, and an executable alternative.
-- After rejecting a material decision, offer a conservative repair and a more authored direction.
-- Let the user accept a known tradeoff. Preserve that choice in later execution.
-- Inspect the actual artifact before claiming success, preservation, or pixel stability.
-- Teach at most one transferable visual mechanism after a high-value task; omit it in fast mode.
+- Judge against purpose, audience, carrier, intended response, constraints, and user choices.
+- Separate observation, measurement, interpretation, preference, and unresolved uncertainty.
+- Tie criticism to visible evidence, consequence, confidence, and an executable alternative.
+- Never infer composition quality from prompt quality or claim visual success without the artifact.
+- Never let a generator approve its own output. Require an independent review record before release.
+- Use trend evidence as a time-stamped input after native ideation, not as the source of the concept.
+- Before every generative attempt, expose the design intent. After it, inspect the actual result.
+- Preserve accepted decisions and known tradeoffs across later attempts.
 
 ## Select one mode
 
-- `direction`: proposition, hierarchy, or visual strategy is unresolved.
-- `production`: an approved visual must become measurable digital or physical artwork.
-- `repair`: an accepted output has a confirmed defect or deviation.
-- `review`: inspect an existing idea or artifact without changing it.
-- `bypass`: perform a mechanical operation without visual diagnosis.
+- `direction`: proposition, viewer relation, hierarchy, or shot logic is unresolved.
+- `production`: an approved direction must become measurable artwork.
+- `repair`: an accepted output has a bounded defect or deviation.
+- `review`: inspect an existing artifact without changing it.
+- `bypass`: perform a mechanical operation without art-direction decisions.
 
-Do not run the full workflow when a lighter mode is sufficient.
+Choose the lightest sufficient mode.
 
-## Run the workflow
+## Run the gates
 
-1. **Route**
-   - Confirm domain, mode, carrier, available assets, and usable tools.
-   - State `成立`, `部分成立`, `当前不成立`, or `信息不足` only when a judgment is useful.
-2. **Clarify**
-   - Ask 0–3 questions only when answers can change the strategy or prevent material failure.
-   - Record reversible assumptions instead of hiding them in a prompt.
-3. **Direct**
-   - When choice matters, offer one conservative and one authored direction.
-   - Describe hierarchy, mechanisms, tradeoffs, and failure signs—not style-label soup.
-4. **Freeze**
-   - Record a minimum Visual Spec: purpose, carrier, first read, selected mechanisms, required
-     content, prohibited outcomes, preservation requirements, and observable pass conditions.
-   - For `production` and `repair`, create a run state with
-     [schemas/run-state.schema.json](schemas/run-state.schema.json). A checkpoint needs a stable
-     reference, role, dimensions, and hash when available.
-5. **Preflight**
-   - List allowed changes, protected elements, required assets, planned attempt budget, and
-     verification method.
-   - Run [scripts/preflight_validate.py](scripts/preflight_validate.py) before mutation.
-6. **Execute**
-   - Prefer deterministic layout/compositing, then masked synthesis, then full-frame generation.
-   - Use the available tool that can actually satisfy the preservation and output requirements.
-7. **Verify**
-   - Inspect the real output at intended use scale and at detail scale when the risk warrants it.
-   - Compare against the frozen spec and checkpoint; do not invent new criteria after seeing output.
-8. **Accept, repair, branch, or stop**
-   - Record the actual result, parent checkpoint, observed changes, remaining risks, and user
-     decision.
+Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 composition proof`
+→ `G4 freeze` → `G5 generation brief + preflight` → `G6 execute` → `G7 independent review`
+→ `G8 user decision`.
 
-Use these phase gates: `G0 route` → `G1 direction` → `G2 freeze` → `G3 preflight` → `G4 verify` →
-`G5 decision`. Do not cross freeze or preflight gates on an assertion alone.
+### G0 Route
+
+- Confirm domain, mode, carrier, quantity, dimensions, assets, rights, and usable tools.
+- Record assumptions when questions would not materially change the route.
+
+### G1 Proposition
+
+- Define what the image asserts, what the viewer is allowed to know, where the viewer is positioned,
+  what changes between first and second read, and the intended feeling or action.
+- Do not substitute mood adjectives for a proposition.
+
+### G2 Native directions
+
+- For zero-reference work, ideate three to five structurally distinct directions before consulting
+  trend signals. Vary viewer position, scale relation, spatial organization, and narrative time—not
+  merely palette or rendering style.
+- Reject any direction that depends on “cinematic,” “surreal,” or similar labels to create interest.
+- Load [zero-reference-direction.md](references/zero-reference-direction.md) and
+  [visual-narrative.md](references/visual-narrative.md).
+- If current aesthetics matter, consult a valid trend snapshot only after native directions exist.
+  Load [aesthetic-radar.md](references/aesthetic-radar.md).
+
+### G3 Composition proof
+
+- Create a shot plan before full-resolution generation.
+- Prove each candidate as a monochrome value thumbnail or explicit mass map: subject envelope,
+  negative space, horizon/plane, eye-line or gaze vector, dominant diagonals, crop pressure, and
+  carrier safe zones.
+- Compare thumbnails at intended feed size. Select by first-read control and narrative consequence.
+- Do not cross this gate with prose alone for a zero-reference hero image or image series.
+- Load [shot-composition-grammar.md](references/shot-composition-grammar.md).
+
+### G4 Freeze
+
+- Freeze a Visual Spec plus a shot plan. For a series, also freeze a series plan and color script.
+- Keep structural invariants separate from shot-level variation. A series needs controlled
+  recurrence and meaningful change; seven near-duplicates are not a series.
+- Use [schemas/visual-spec.schema.json](schemas/visual-spec.schema.json),
+  [schemas/shot-plan.schema.json](schemas/shot-plan.schema.json), and when relevant
+  [schemas/series-plan.schema.json](schemas/series-plan.schema.json).
+- For production and repair, create [schemas/run-state.schema.json](schemas/run-state.schema.json).
+- Register every release-relevant file in
+  [schemas/evidence-registry.schema.json](schemas/evidence-registry.schema.json); references in an
+  accepted run are evidence IDs, not unchecked paths or URIs.
+
+### G5 Generation brief and preflight
+
+- State a concise `生成前设计说明`: objective, viewer position, first read, composition geometry,
+  narrative beat, color/light logic, required and protected content, and the main failure risk.
+- Record the attempt's backend, exact model/version, prompt or prompt hash, parameters, reference
+  roles and weights, seed when used, timestamp, and output reference.
+- Run [preflight_validate.py](scripts/preflight_validate.py). This checks contract integrity only; it
+  is not an aesthetic review.
+
+### G6 Execute
+
+- Prefer deterministic layout for exact text, logos, geometry, crop, and export.
+- Use masked synthesis for bounded semantic changes; use full-frame generation for new composition.
+- Generate one pilot before expanding a series.
+- For exploration, vary one named structural variable per batch. Record all candidates, including
+  rejected ones, so selection bias is visible.
+- Inspect every returned image before another generative call.
+
+### G7 Independent review
+
+- Build a blind review packet without prompt rhetoric or the generator's self-justification.
+- Review in this order: carrier read, composition, narrative, color/light, material/physics,
+  AI residue, spec fit, then preference.
+- The reviewer may be a fresh-context pass, a different capable reviewer, or the user. A VLM can
+  assist but cannot establish invisible facts or final taste.
+- Record findings with [schemas/artifact-review.schema.json](schemas/artifact-review.schema.json)
+  and validate with [review_validate.py](scripts/review_validate.py).
+- Load [generated-image-authenticity.md](references/generated-image-authenticity.md).
+
+### G8 User decision
+
+- Recommend `accept`, `local-repair`, `regenerate`, `branch`, or `user-judgment`.
+- `phase: accept` requires actual user acceptance, not internal approval.
+- Expand a series only after pilot approval. Release only after independent review and user decision.
+
+## Design image series deliberately
+
+- Give each frame one job in the argument and one distinct spatial strategy.
+- Freeze the recurring subject grammar, material world, palette logic, and carrier behavior.
+- Vary shot distance, viewpoint, occlusion, density, time, and information asymmetry.
+- Use a contact sheet to test rhythm, repetition, tonal pacing, accidental continuity, and whether
+  any frame becomes filler.
+- Load [color-and-light-script.md](references/color-and-light-script.md) for every authored series.
 
 ## Preserve value through repair
 
-Freezing and repeated repair are core capabilities. Do not impose a universal maximum number of
-repairs.
-
 - Freeze decisions and checkpoints; do not freeze the execution method.
-- Allow multiple repairs when each one has a named parent, bounded target, observable benefit, and
-  preservation check appropriate to its risk.
-- Treat the attempt budget as the currently approved budget, not a lifetime limit. Expand it only
-  after reporting evidence and tradeoffs.
-- Prefer a new branch from the best checkpoint when non-target drift grows. Chaining is allowed when
-  the newest checkpoint is genuinely better and the next change depends on it.
-- Track use-scale quality, detail-scale risk, protected-region drift, and trend separately.
-- A detail artifact is not automatically a product blocker when it is invisible at the real carrier
-  and stable across rounds. Escalate when it becomes visible, spreads, or worsens.
-- Stop or change method after two consecutive non-improving rounds, new higher-priority damage, or
-  evidence that the tool cannot provide the claimed locality. This is a trend rule, not a repair
-  count rule.
+- Name the parent, bounded target, protected region, benefit, and verification for each repair.
+- Branch from the best checkpoint when non-target drift grows.
+- Track use-scale quality, detail-scale risk, protected drift, and trajectory separately.
+- Stop or change method after two consecutive non-improving rounds or new higher-priority damage.
 
-Load [references/preservation-and-repair.md](references/preservation-and-repair.md) before changing
-an accepted artifact.
+Load [preservation-and-repair.md](references/preservation-and-repair.md) before changing an accepted
+artifact. Load [texture-integrity.md](references/texture-integrity.md) for cross-material artifacts.
 
-## Route tools by operation
+## Route references and tools
 
-1. Use deterministic tools for exact text, logos, layout, crop, dimensions, color replacement,
-   export, and accepted-pixel preservation.
-2. Use a real mask or region-scoped synthesis for local semantic changes.
-3. Use full-frame generation for a new composition, subject, or global material system.
-4. Keep image generation and exact typography separate when text fidelity matters.
-5. If the available tool cannot prove locality, call the result visually similar or unverified—not
-   pixel-preserving.
+- Reference work: classify `mechanism-transfer`, `owned-reconstruction`, or
+  `restricted-imitation`; load [reference-deconstruction.md](references/reference-deconstruction.md).
+- Social/poster carrier: load [social-key-visual.md](references/social-key-visual.md).
+- Physical output: load [physical-collateral.md](references/physical-collateral.md).
+- Critique/disagreement: load [critique-protocol.md](references/critique-protocol.md).
+- Vague/conflicting brief: load [clarification-patterns.md](references/clarification-patterns.md).
 
-For reference-led work, classify the request:
+Use deterministic helpers when they establish facts:
 
-- `mechanism-transfer`: create new content from selected visual mechanisms;
-- `owned-reconstruction`: rebuild an authorized design with measurable fidelity;
-- `restricted-imitation`: translate protected identity, signature, or living-artist style into
-  non-identifying mechanisms.
+- [build_asset_manifest.py](scripts/build_asset_manifest.py): hashes, dimensions, and metadata.
+- [analyze_reference.py](scripts/analyze_reference.py): measurable palette/value/edge evidence.
+- [build_region_mask.py](scripts/build_region_mask.py), [refine_mask.py](scripts/refine_mask.py),
+  [composite_region.py](scripts/composite_region.py), and
+  [verify_mask_preservation.py](scripts/verify_mask_preservation.py): bounded repair.
+- [build_series_contact_sheet.py](scripts/build_series_contact_sheet.py): carrier-scale series view.
+- [build_blind_review_packet.py](scripts/build_blind_review_packet.py): prompt-blind review packet.
+- [trend_validate.py](scripts/trend_validate.py): snapshot freshness, source diversity, and evidence
+  integrity; it does not collect or rank trends.
+- [benchmark_score.py](scripts/benchmark_score.py): verify blind pairwise benchmark integrity and
+  compute preference rate plus Wilson confidence bounds.
+- [evidence_validate.py](scripts/evidence_validate.py): resolve local evidence, size, and SHA-256
+  before a review or acceptance gate can pass.
+- [run_tests.py](scripts/run_tests.py): run deterministic positive and adversarial integrity tests.
+- [self_check.py](scripts/self_check.py): compile scripts, run deterministic tests, validate schemas
+  and examples, check eval manifests, and resolve local documentation links. Use `--strict` for a
+  release check with the dependencies in `requirements-dev.txt`.
 
-Do not call mechanism transfer “pixel-perfect recreation.”
-
-## Load only the needed reference
-
-- Vague or conflicting brief: [clarification-patterns.md](references/clarification-patterns.md)
-- Critique or disagreement: [critique-protocol.md](references/critique-protocol.md)
-- Reference images or reconstruction: [reference-deconstruction.md](references/reference-deconstruction.md)
-- Social key visual or poster: [social-key-visual.md](references/social-key-visual.md)
-- Physical collateral or print handoff: [physical-collateral.md](references/physical-collateral.md)
-- Accepted-output modification: [preservation-and-repair.md](references/preservation-and-repair.md)
-- Repeated organic-surface or cross-material artifacts:
-  [texture-integrity.md](references/texture-integrity.md)
-
-Load [examples/paired-cases.md](examples/paired-cases.md) only when behavior needs calibration.
-
-## Use deterministic helpers
-
-- [build_asset_manifest.py](scripts/build_asset_manifest.py): paths, hashes, sizes, and image
-  metadata; image fields require Pillow.
-- [analyze_reference.py](scripts/analyze_reference.py): palette, luminance, saturation, edge, and
-  grid measurements; requires Pillow.
-- [build_region_mask.py](scripts/build_region_mask.py): reviewed shape regions to a soft mask and
-  preview; requires Pillow.
-- [refine_mask.py](scripts/refine_mask.py): subtract protected regions from a mask; requires Pillow.
-- [composite_region.py](scripts/composite_region.py): composite an approved crop into an immutable
-  source; requires Pillow.
-- [verify_mask_preservation.py](scripts/verify_mask_preservation.py): prove outside-mask pixel
-  stability; requires Pillow and NumPy.
-
-Scripts establish technical facts. They do not decide meaning, cultural fit, or aesthetic quality.
+Scripts establish technical facts, never meaning or aesthetic merit.
 
 ## Communicate compactly
 
-Use only the sections the user needs:
+For direction:
 
 ```text
-判断：成立｜部分成立｜当前不成立｜信息不足
-依据：可见事实或已知约束
-后果：对目的、受众、载体或执行的影响
-下一步：问题、方向、执行或修复
+命题 / 观众位置 / 第一读与第二读 / 结构选择 / 色光逻辑 / 失败征兆
 ```
 
-For a production or repair handoff, include:
+For every generative attempt:
 
 ```text
-模式 / 阶段
-批准检查点 / 父版本
-允许修改 / 必须保护
-方法 / 当前尝试预算
-使用尺度结果 / 细节尺度风险 / 非目标漂移 / 趋势
-决定：接受｜继续修复｜分支｜停止
+生成前设计说明
+目标 / 观众位置 / 第一视觉 / 构图几何 / 叙事拍点 / 色光 / 必须与保护 / 主要风险
+
+生成后检查
+可见符合项 / 偏差证据 / AI痕迹与物理风险 / 最高优先改进
+建议：接受｜局部修复｜重生｜分支｜用户判断
 ```
 
 Do not dump internal JSON unless a tool or the user needs it.
 
-## Respect uncertainty, culture, and authority
+## Stop honestly
 
-- Do not turn modernist minimalism, color psychology, composition formulas, or personal taste into
-  universal rules.
-- Treat cultural symbolism, trend claims, and audience psychology as contextual unless verified.
-- Request authoritative logos, copy, dimensions, and production specifications instead of
-  improvising certainty.
-- Keep user overrides unless new technical, legal, or safety evidence appears.
-- Critique the decision and artifact, never the user's identity or competence.
+Stop the current method when evidence is insufficient, a material choice or permission is missing,
+the tool cannot meet the contract, two rounds do not improve, or improvement would damage a
+higher-priority invariant. Preserve useful checkpoints and propose the next viable branch.
 
-## Evaluate and stop honestly
+## Benchmark against the quality target
 
-Use [evals/evals.json](evals/evals.json) for clean-context regression tests. Evaluate both outcome
-and trajectory: correct trigger, useful clarification, real checkpoint, tool choice, preservation,
-artifact inspection, failure detection, and user override.
+- Keep benchmark images out of direction and generation context; evaluate after MoSoCanvas output
+  is frozen to avoid imitation and fixation.
+- Sample a dated, versioned Midjourney benchmark set across the same task classes and carriers.
+- Compare anonymous A/B artifacts under the same brief using randomized sides and independent
+  raters. Score overall preference plus composition, authored specificity, narrative, color/light,
+  material coherence, AI residue, series rhythm, and carrier fit.
+- Do not claim “matches” or “exceeds” from a single image, average score, or self-review. Require
+  hard-defect parity and a predeclared multi-task preference threshold with confidence bounds.
+- Load [midjourney-quality-benchmark.md](references/midjourney-quality-benchmark.md) and use
+  [schemas/benchmark-suite.schema.json](schemas/benchmark-suite.schema.json) with
+  [schemas/pairwise-evaluation.schema.json](schemas/pairwise-evaluation.schema.json).
 
-Stop the current method—not necessarily the project—when evidence is insufficient, a required asset
-or permission is missing, the tool cannot meet the contract, two consecutive rounds do not improve,
-or improvement would damage a higher-priority protected element. Preserve all useful checkpoints
-and propose the next viable branch.
+Use [evals/evals.json](evals/evals.json) for clean-context regression tests. Test both outcome and
+trajectory, including composition proof, series rhythm, color logic, benchmark integrity, blind
+review, false acceptance, and trend freshness.
+
+When auditing or extending the method, load
+[evidence-foundations.md](references/evidence-foundations.md) to preserve the boundary between
+established evidence, professional practice, and MoSoCanvas's operational heuristics.
