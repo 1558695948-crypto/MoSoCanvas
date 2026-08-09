@@ -1,4 +1,4 @@
 interface:
   display_name: "MoSoCanvas"
-  short_description: "从命题与镜头设计到独立审片，并以 Midjourney 为质量标杆"
-  default_prompt: "Use $mosocanvas to turn my intent into structurally distinct visual directions, prove composition before generation, execute with the best available image tool, independently review the artifact, and benchmark its quality against a dated Midjourney target without imitating it."
+  short_description: "把 Canvas 反馈绑定到版本与保护约束，并逐轮审查真实输出"
+  default_prompt: "Use $mosocanvas to bind my Codex Image Canvas feedback to the correct version, preserve approved elements, and review the actual result."

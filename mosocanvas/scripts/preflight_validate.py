@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate MoSoCanvas v0.2 execution contracts without claiming visual quality."""
+"""Validate MoSoCanvas v1.3 execution contracts without claiming visual quality."""
 
 from __future__ import annotations
 
@@ -10,6 +10,9 @@ from pathlib import Path
 from typing import Any
 
 from evidence import EvidenceError, load_object, load_registry, require_evidence
+from attempt_review_validate import validate as validate_attempt_review
+from feedback_validate import validate as validate_feedback_delta
+from native_canvas_validate import validate as validate_native_canvas_feedback
 from review_integrity import validate_authorized_review
 
 PHASES_AFTER_FREEZE = {
@@ -60,7 +63,7 @@ def finish(
     args: argparse.Namespace, blockers: list[str], warnings: list[str]
 ) -> int:
     report = {
-        "schema": "moso.preflight-report/0.4",
+        "schema": "moso.preflight-report/0.6",
         "scope": "contract-integrity-only",
         "run_state": str(args.run_state.resolve()),
         "status": "block" if blockers else "pass",
@@ -116,6 +119,10 @@ def validate_release_evidence(
 
     output_ids: set[str] = set()
     independent_review_ids: set[str] = set()
+    attempt_review_ids: set[str] = set()
+    comparison_ids: set[str] = set()
+    feedback_ids: set[str] = set()
+    canvas_feedback_ids: set[str] = set()
     for attempt in state.get("generation_attempts") or []:
         execution = attempt.get("execution") or {}
         prompt_ref = execution.get("prompt_ref")
@@ -125,13 +132,30 @@ def validate_release_evidence(
         if output_ref:
             output_ids.add(str(output_ref))
             required.append((str(output_ref), {"artifact"}))
-        self_review_ref = attempt.get("self_review_ref")
-        if self_review_ref:
-            required.append((str(self_review_ref), {"artifact-review"}))
+        attempt_review_ref = attempt.get("attempt_review_ref")
+        if attempt_review_ref:
+            attempt_review_ids.add(str(attempt_review_ref))
+            required.append((str(attempt_review_ref), {"attempt-review"}))
+        comparison_ref = attempt.get("attempt_comparison_ref")
+        if comparison_ref:
+            comparison_ids.add(str(comparison_ref))
+            required.append((str(comparison_ref), {"attempt-comparison"}))
+        for feedback_ref in attempt.get("feedback_delta_refs") or []:
+            feedback_ids.add(str(feedback_ref))
+            required.append((str(feedback_ref), {"feedback-delta"}))
+        for canvas_ref in attempt.get("native_canvas_feedback_refs") or []:
+            canvas_feedback_ids.add(str(canvas_ref))
+            required.append((str(canvas_ref), {"native-canvas-feedback"}))
         review_ref = attempt.get("independent_review_ref")
         if review_ref:
             independent_review_ids.add(str(review_ref))
             required.append((str(review_ref), {"artifact-review"}))
+    for feedback_ref in state.get("feedback_delta_refs") or []:
+        feedback_ids.add(str(feedback_ref))
+        required.append((str(feedback_ref), {"feedback-delta"}))
+    for canvas_ref in state.get("native_canvas_feedback_refs") or []:
+        canvas_feedback_ids.add(str(canvas_ref))
+        required.append((str(canvas_ref), {"native-canvas-feedback"}))
 
     resolved: dict[str, Path] = {}
     for evidence_id, kinds in required:
@@ -141,6 +165,61 @@ def validate_release_evidence(
         try:
             _, path = require_evidence(evidence_id, indexed, registry_path, kinds)
             resolved[evidence_id] = path
+        except EvidenceError as exc:
+            blockers.append(str(exc))
+
+    for review_id in attempt_review_ids:
+        if review_id not in resolved:
+            continue
+        try:
+            review = load_object(resolved[review_id], "attempt review")
+            review_blockers, _ = validate_attempt_review(review)
+            blockers.extend(f"attempt review {review_id}: {item}" for item in review_blockers)
+        except EvidenceError as exc:
+            blockers.append(str(exc))
+    for feedback_id in feedback_ids:
+        if feedback_id not in resolved:
+            continue
+        try:
+            delta = load_object(resolved[feedback_id], "feedback delta")
+            delta_blockers, _ = validate_feedback_delta(delta)
+            blockers.extend(f"feedback delta {feedback_id}: {item}" for item in delta_blockers)
+        except EvidenceError as exc:
+            blockers.append(str(exc))
+    for canvas_id in canvas_feedback_ids:
+        if canvas_id not in resolved:
+            continue
+        try:
+            canvas_feedback = load_object(resolved[canvas_id], "native Canvas feedback")
+            canvas_blockers, _ = validate_native_canvas_feedback(canvas_feedback)
+            blockers.extend(
+                f"native Canvas feedback {canvas_id}: {item}" for item in canvas_blockers
+            )
+            if canvas_feedback.get("task_id") != state.get("task_id"):
+                blockers.append(
+                    f"native Canvas feedback {canvas_id} task_id does not match run state"
+                )
+            linked_deltas = {
+                str(binding.get("feedback_delta_ref"))
+                for binding in canvas_feedback.get("bindings") or []
+                if binding.get("feedback_delta_ref")
+            }
+            missing = linked_deltas - feedback_ids
+            if missing:
+                blockers.append(
+                    f"native Canvas feedback {canvas_id} links unregistered feedback deltas: {sorted(missing)}"
+                )
+        except EvidenceError as exc:
+            blockers.append(str(exc))
+    for comparison_id in comparison_ids:
+        if comparison_id not in resolved:
+            continue
+        try:
+            comparison = load_object(resolved[comparison_id], "attempt comparison")
+            if comparison.get("schema") != "moso.attempt-comparison/0.1":
+                blockers.append(f"attempt comparison {comparison_id} has the wrong schema")
+            if (comparison.get("target_change") or {}).get("status") == "unreviewed":
+                blockers.append(f"attempt comparison {comparison_id} lacks visual target review")
         except EvidenceError as exc:
             blockers.append(str(exc))
 
@@ -164,7 +243,8 @@ def validate_release_evidence(
         try:
             spec_document = load_object(resolved[str(spec_id)], "visual spec")
             if spec_document.get("schema") not in {
-                "moso.visual-spec/0.1", "moso.visual-spec/0.2"
+                "moso.visual-spec/0.1", "moso.visual-spec/0.2",
+                "moso.visual-spec/0.3", "moso.visual-spec/0.4"
             }:
                 blockers.append("registered visual spec has the wrong schema")
         except EvidenceError as exc:
@@ -276,9 +356,9 @@ def main() -> int:
     state = load_json(args.run_state, "run state", blockers)
     base = args.run_state.resolve().parent
 
-    if state.get("schema") != "moso.run-state/0.4":
+    if state.get("schema") != "moso.run-state/0.6":
         blockers.append(
-            "run state must migrate to moso.run-state/0.4; legacy self-review fields cannot "
+            "run state must migrate to moso.run-state/0.6; legacy review fields cannot "
             "authorize execution or acceptance"
         )
         if state.get("phase") == "accept":
@@ -403,8 +483,70 @@ def main() -> int:
     if is_generative and not attempts:
         blockers.append("generative execution requires generation_attempts")
 
+    def validate_feedback_refs(refs: list[str], label: str) -> None:
+        for ref in refs:
+            if release_registry_mode:
+                continue
+            path = resolve_local(str(ref), base)
+            if not path:
+                warnings.append(f"{label} feedback delta is not locally verifiable: {ref}")
+                continue
+            document = load_json(path, f"{label} feedback delta", blockers)
+            delta_blockers, delta_warnings = validate_feedback_delta(document)
+            blockers.extend(f"{label}: {item}" for item in delta_blockers)
+            warnings.extend(f"{label}: {item}" for item in delta_warnings)
+
+    def validate_canvas_refs(
+        refs: list[str], feedback_refs: list[str], label: str
+    ) -> None:
+        feedback_set = {str(ref) for ref in feedback_refs}
+        for ref in refs:
+            if release_registry_mode:
+                continue
+            path = resolve_local(str(ref), base)
+            if not path:
+                warnings.append(f"{label} native Canvas feedback is not locally verifiable: {ref}")
+                continue
+            document = load_json(path, f"{label} native Canvas feedback", blockers)
+            canvas_blockers, canvas_warnings = validate_native_canvas_feedback(document)
+            blockers.extend(f"{label}: {item}" for item in canvas_blockers)
+            warnings.extend(f"{label}: {item}" for item in canvas_warnings)
+            if document.get("task_id") != state.get("task_id"):
+                blockers.append(f"{label} native Canvas feedback task_id does not match run state")
+            linked_deltas = {
+                str(binding.get("feedback_delta_ref"))
+                for binding in document.get("bindings") or []
+                if binding.get("feedback_delta_ref")
+            }
+            missing = linked_deltas - feedback_set
+            if missing:
+                blockers.append(
+                    f"{label} native Canvas feedback links deltas not attached to the same run/attempt: {sorted(missing)}"
+                )
+
+    validate_feedback_refs(state.get("feedback_delta_refs") or [], "run state")
+    validate_canvas_refs(
+        state.get("native_canvas_feedback_refs") or [],
+        state.get("feedback_delta_refs") or [],
+        "run state",
+    )
+    observed_target_statuses: list[str] = []
+    comparison_decisions: list[str] = []
+
     for index, attempt in enumerate(attempts, start=1):
         prefix = f"generation attempt {index}"
+        flag_missing_keys(
+            attempt,
+            ("attempt_id", "status", "trajectory_response", "trajectory_reason"),
+            prefix,
+            blockers,
+        )
+        validate_feedback_refs(attempt.get("feedback_delta_refs") or [], prefix)
+        validate_canvas_refs(
+            attempt.get("native_canvas_feedback_refs") or [],
+            attempt.get("feedback_delta_refs") or [],
+            prefix,
+        )
         brief = attempt.get("pre_generation_brief") or {}
         flag_missing_keys(
             brief,
@@ -431,20 +573,70 @@ def main() -> int:
                 f"{prefix} execution",
                 blockers,
             )
-        if phase in PHASES_AFTER_EXECUTION and status == "planned":
-            blockers.append(f"{prefix} cannot remain planned after execution")
-        if status == "reviewed":
-            if not attempt.get("self_review_ref"):
-                blockers.append(f"{prefix} reviewed status requires self_review_ref")
-            if not attempt.get("independent_review_ref"):
-                blockers.append(f"{prefix} reviewed status requires independent_review_ref")
-            if (
-                attempt.get("self_review_ref")
-                and attempt.get("self_review_ref") == attempt.get("independent_review_ref")
-            ):
-                blockers.append(
-                    f"{prefix} self review and independent review must be different evidence"
-                )
+        if phase in PHASES_AFTER_EXECUTION and status in {"planned", "generated"}:
+            blockers.append(f"{prefix} must complete immediate review after execution")
+        if status in {"reviewed", "rejected"}:
+            review_ref = attempt.get("attempt_review_ref")
+            if not review_ref:
+                blockers.append(f"{prefix} {status} status requires attempt_review_ref")
+            elif not release_registry_mode:
+                review_path = resolve_local(str(review_ref), base)
+                if not review_path:
+                    warnings.append(f"{prefix} attempt review is not locally verifiable")
+                else:
+                    review = load_json(review_path, f"{prefix} attempt review", blockers)
+                    review_blockers, review_warnings = validate_attempt_review(review)
+                    blockers.extend(f"{prefix}: {item}" for item in review_blockers)
+                    warnings.extend(f"{prefix}: {item}" for item in review_warnings)
+                    if review.get("attempt_id") != attempt.get("attempt_id"):
+                        blockers.append(f"{prefix} review attempt_id does not match")
+                    observed_target_statuses.append(
+                        str((review.get("target_change") or {}).get("status", "unobservable"))
+                    )
+
+            if attempt.get("parent_attempt_id"):
+                comparison_ref = attempt.get("attempt_comparison_ref")
+                if not comparison_ref:
+                    blockers.append(f"{prefix} with parent_attempt_id requires attempt_comparison_ref")
+                elif not release_registry_mode:
+                    comparison_path = resolve_local(str(comparison_ref), base)
+                    if not comparison_path:
+                        warnings.append(f"{prefix} attempt comparison is not locally verifiable")
+                    else:
+                        comparison = load_json(
+                            comparison_path, f"{prefix} attempt comparison", blockers
+                        )
+                        if comparison.get("schema") != "moso.attempt-comparison/0.1":
+                            blockers.append(f"{prefix} comparison has the wrong schema")
+                        target_status = (comparison.get("target_change") or {}).get("status")
+                        if target_status == "unreviewed":
+                            blockers.append(f"{prefix} comparison requires visual target review")
+                        decision = str(comparison.get("trajectory_decision", ""))
+                        comparison_decisions.append(decision)
+
+    for index, attempt in enumerate(attempts[:-1], start=1):
+        if attempt.get("status") == "generated" and any(
+            later.get("status") == "planned" for later in attempts[index:]
+        ):
+            blockers.append(
+                f"generation attempt {index} must be reviewed before another generation"
+            )
+
+    if attempts and attempts[-1].get("status") == "planned":
+        response = attempts[-1].get("trajectory_response")
+        non_improving = {"missed", "unobservable"}
+        if len(observed_target_statuses) >= 2 and all(
+            status in non_improving for status in observed_target_statuses[-2:]
+        ) and response not in {"change-method", "branch"}:
+            blockers.append(
+                "two consecutive non-improving rounds require change-method or branch"
+            )
+        if comparison_decisions and comparison_decisions[-1] in {
+            "change-method", "branch", "stop"
+        } and response == "continue":
+            blockers.append(
+                "the latest comparison forbids continuing the same method"
+            )
 
     if phase in {"execute", "independent-review", "decision", "accept"}:
         if state.get("direction_approval_status") not in {

@@ -1,0 +1,45 @@
+{
+  "schema": "moso.native-canvas-feedback/0.1",
+  "id": "canvas-feedback-cat-wing-v7",
+  "task_id": "mosocanvas-tar-astronaut-poster",
+  "created_at": "2026-08-09T18:00:00+08:00",
+  "host": {
+    "product": "codex",
+    "surface": "image-canvas",
+    "structured_selection_available": false
+  },
+  "interaction": {
+    "kind": "focused-comment",
+    "message_ref": "codex://message/cat-wing-feedback",
+    "comment_text": "让猫的翅膀小一点，人物和字体不要变。"
+  },
+  "intent": "edit",
+  "execution_scope": "semantic-local-edit",
+  "bindings": [
+    {
+      "artifact_ref": "codex://artifact/tar-poster-v7",
+      "attempt_id": "repair-07",
+      "role": "edit-parent",
+      "feedback_delta_ref": "native-canvas-feedback-delta.example.json"
+    }
+  ],
+  "region_locators": [
+    {
+      "id": "region-cat-wings",
+      "target_label": "焦油猫的两只翅膀",
+      "kind": "natural-language",
+      "machine_geometry_available": false,
+      "user_confirmed": true,
+      "fallback_description": "画面右侧焦油猫背部的小型翅膀，不包含人物手臂。"
+    }
+  ],
+  "binding_status": {
+    "status": "bound",
+    "confidence": "high",
+    "reason": "Focused comment names one visible object and explicitly protects the person and typography."
+  },
+  "user_visible_contract": true,
+  "known_limitations": [
+    "Codex native Canvas selection geometry was not available to the Skill; this is a semantic local edit, not a verified mask edit."
+  ]
+}

@@ -3,7 +3,7 @@ name: mosocanvas
 description: Evidence-based visual direction for zero-reference or reference-led campaign images, posters, social image series, and physical promotional collateral. Use when Codex must turn an intent into authored shots, composition boards, visual narrative, color/light scripts, trend-informed mechanisms, independent artifact reviews, controlled repairs, or blind quality benchmarking against leading image generators such as Midjourney. Do not use for mechanical conversion, UI/product-flow design, pure retouching without art-direction decisions, or visual claims about an artifact that cannot be inspected.
 ---
 
-# MoSoCanvas v1.1.0
+# MoSoCanvas v1.3.0
 
 Act as a visual director, not a prompt decorator. Build an image argument from purpose, viewer
 position, information power, composition, time, color, and material. Keep execution model-neutral.
@@ -19,6 +19,10 @@ Treat Midjourney as a moving external quality target, never as a required backen
 - Use trend evidence as a time-stamped input after native ideation, not as the source of the concept.
 - Before every generative attempt, expose the design intent. After it, inspect the actual result.
 - Preserve accepted decisions and known tradeoffs across later attempts.
+- Compile every material user correction into a parent-bound feedback delta before another attempt.
+- Bind Codex Image Canvas comments to explicit artifacts before treating “this one” or “this area”
+  as an executable instruction.
+- Treat pixel and edge deltas as stall evidence, never as proof that the intended semantic change worked.
 
 ## Select one mode
 
@@ -87,8 +91,18 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
   narrative beat, color/light logic, required and protected content, and the main failure risk.
 - Record the attempt's backend, exact model/version, prompt or prompt hash, parameters, reference
   roles and weights, seed when used, timestamp, and output reference.
+- When the attempt responds to user feedback, create and validate
+  [schemas/feedback-delta.schema.json](schemas/feedback-delta.schema.json). Separate `change`,
+  `preserve`, `prohibit`, element relationships, promoted accidents, and observable verification.
+- When feedback originates in Codex Image Canvas, first bind the selected artifact(s), interaction,
+  intent, and honest region locator with
+  [schemas/native-canvas-feedback.schema.json](schemas/native-canvas-feedback.schema.json). Give
+  every edit parent its own Feedback Delta. A host comment is not proof of a mask.
 - Run [preflight_validate.py](scripts/preflight_validate.py). This checks contract integrity only; it
   is not an aesthetic review.
+- A pure Skill cannot intercept a host-native image tool. Treat a passing preflight as a mandatory
+  procedural gate, not a claim of platform-level enforcement. Upgrade to a Plugin only when hard
+  interception is required.
 
 ### G6 Execute
 
@@ -97,7 +111,16 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Generate one pilot before expanding a series.
 - For exploration, vary one named structural variable per batch. Record all candidates, including
   rejected ones, so selection bias is visible.
-- Inspect every returned image before another generative call.
+- Inspect every returned image before another generative call. Record the immediate inspection with
+  [schemas/attempt-review.schema.json](schemas/attempt-review.schema.json); this review may be in
+  the generating context and cannot authorize release.
+- When an attempt has a parent, compare them with
+  [schemas/attempt-comparison.schema.json](schemas/attempt-comparison.schema.json). Use automated
+  delta only to detect near-duplicates or broad drift; visually judge the named target variable.
+- After two consecutive missed or unobservable target changes, change method or branch. Do not
+  continue micro-prompting the same parent.
+- Return the child and parent artifacts to Canvas for comparison when the host supports it; record a
+  new adapter entry for later comments instead of overwriting the original feedback.
 
 ### G7 Independent review
 
@@ -106,6 +129,8 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
   AI residue, spec fit, then preference.
 - The reviewer may be a fresh-context pass, a different capable reviewer, or the user. A VLM can
   assist but cannot establish invisible facts or final taste.
+- Require independent review for a selected pilot, series expansion, or release—not for every
+  discarded exploration candidate. Immediate attempt review remains mandatory for every image.
 - Record findings with [schemas/artifact-review.schema.json](schemas/artifact-review.schema.json)
   and validate with [review_validate.py](scripts/review_validate.py).
 - Load [generated-image-authenticity.md](references/generated-image-authenticity.md).
@@ -132,6 +157,10 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Branch from the best checkpoint when non-target drift grows.
 - Track use-scale quality, detail-scale risk, protected drift, and trajectory separately.
 - Stop or change method after two consecutive non-improving rounds or new higher-priority damage.
+- Translate user corrections into a feedback delta before repair. Never append a correction to the
+  prompt while leaving the frozen spec and preservation contract stale.
+- Promote an unexpected generated feature only after the user assigns it a role; once promoted,
+  add it to preservation and verify it like any authored decision.
 
 Load [preservation-and-repair.md](references/preservation-and-repair.md) before changing an accepted
 artifact. Load [texture-integrity.md](references/texture-integrity.md) for cross-material artifacts.
@@ -141,9 +170,13 @@ artifact. Load [texture-integrity.md](references/texture-integrity.md) for cross
 - Reference work: classify `mechanism-transfer`, `owned-reconstruction`, or
   `restricted-imitation`; load [reference-deconstruction.md](references/reference-deconstruction.md).
 - Social/poster carrier: load [social-key-visual.md](references/social-key-visual.md).
+- Final MoSo-authored social artwork: load [brand-signature.md](references/brand-signature.md) and
+  apply the approved deterministic signature asset unless an explicit exception applies.
 - Physical output: load [physical-collateral.md](references/physical-collateral.md).
 - Critique/disagreement: load [critique-protocol.md](references/critique-protocol.md).
 - Vague/conflicting brief: load [clarification-patterns.md](references/clarification-patterns.md).
+- Codex Image Canvas comment, multi-select, or focused-view feedback: load
+  [native-canvas-integration.md](references/native-canvas-integration.md).
 
 Use deterministic helpers when they establish facts:
 
@@ -154,10 +187,20 @@ Use deterministic helpers when they establish facts:
   [verify_mask_preservation.py](scripts/verify_mask_preservation.py): bounded repair.
 - [build_series_contact_sheet.py](scripts/build_series_contact_sheet.py): carrier-scale series view.
 - [build_blind_review_packet.py](scripts/build_blind_review_packet.py): prompt-blind review packet.
+- [feedback_validate.py](scripts/feedback_validate.py): feedback constraint and verification
+  coverage; it does not infer intent.
+- [native_canvas_validate.py](scripts/native_canvas_validate.py): artifact binding, per-parent Delta
+  coverage, and truthful region geometry for Codex Image Canvas feedback.
+- [attempt_review_validate.py](scripts/attempt_review_validate.py): mandatory post-generation
+  inspection integrity; it does not authorize release.
+- [compare_attempts.py](scripts/compare_attempts.py): non-semantic color, luminance, edge, and hash
+  delta for stall diagnosis; requires Pillow.
 - [trend_validate.py](scripts/trend_validate.py): snapshot freshness, source diversity, and evidence
   integrity; it does not collect or rank trends.
 - [benchmark_score.py](scripts/benchmark_score.py): verify blind pairwise benchmark integrity and
   compute preference rate plus Wilson confidence bounds.
+- [ablation_score.py](scripts/ablation_score.py): validate same-backend B0/B1/M0 contribution
+  experiments and summarize control, cost, friction, defects, and blind preference separately.
 - [evidence_validate.py](scripts/evidence_validate.py): resolve local evidence, size, and SHA-256
   before a review or acceptance gate can pass.
 - [run_tests.py](scripts/run_tests.py): run deterministic positive and adversarial integrity tests.
@@ -186,6 +229,13 @@ For every generative attempt:
 建议：接受｜局部修复｜重生｜分支｜用户判断
 ```
 
+For a material user correction:
+
+```text
+反馈 Delta
+父版本 / 只改 / 必须保护 / 禁止结果 / 元素关系 / 通过条件
+```
+
 Do not dump internal JSON unless a tool or the user needs it.
 
 ## Stop honestly
@@ -207,6 +257,19 @@ higher-priority invariant. Preserve useful checkpoints and propose the next viab
 - Load [midjourney-quality-benchmark.md](references/midjourney-quality-benchmark.md) and use
   [schemas/benchmark-suite.schema.json](schemas/benchmark-suite.schema.json) with
   [schemas/pairwise-evaluation.schema.json](schemas/pairwise-evaluation.schema.json).
+
+## Measure MoSoCanvas contribution separately
+
+- Do not use the Midjourney benchmark to attribute an improvement to this Skill.
+- Compare `B0-direct`, `B1-generic-clarify`, and `M0-mosocanvas` on the same backend/model, frozen
+  brief and assets, equal generation budget, randomized condition order, and blind artifact rating.
+- Report acceptance, corrections, protected-decision loss, severe defects, time, friction, and blind
+  preference as separate outcomes. Never combine them into one aesthetic or contribution score.
+- Five to ten tasks test instrumentation only. Do not make a directional contribution claim before
+  at least 20 matched tasks, three independent raters, and more than one task class.
+- Load [same-backend-ablation.md](references/same-backend-ablation.md), record
+  [schemas/skill-ablation-study.schema.json](schemas/skill-ablation-study.schema.json), and summarize
+  it with [ablation_score.py](scripts/ablation_score.py).
 
 Use [evals/evals.json](evals/evals.json) for clean-context regression tests. Test both outcome and
 trajectory, including composition proof, series rhythm, color logic, benchmark integrity, blind

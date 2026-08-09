@@ -15,9 +15,15 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 EXAMPLE_SCHEMAS = {
+    "attempt-comparison.example.json": "attempt-comparison.schema.json",
+    "attempt-review.example.json": "attempt-review.schema.json",
     "artifact-review.example.json": "artifact-review.schema.json",
+    "feedback-delta.example.json": "feedback-delta.schema.json",
+    "native-canvas-feedback.example.json": "native-canvas-feedback.schema.json",
+    "native-canvas-feedback-delta.example.json": "feedback-delta.schema.json",
     "repair-run-state.example.json": "run-state.schema.json",
     "run-state.example.json": "run-state.schema.json",
+    "skill-ablation-study.example.json": "skill-ablation-study.schema.json",
     "series-plan.example.json": "series-plan.schema.json",
     "shot-plan.example.json": "shot-plan.schema.json",
     "visual-spec.example.json": "visual-spec.schema.json",
@@ -65,22 +71,22 @@ def validate_evals(blockers: list[str]) -> int:
 
 
 def validate_version(blockers: list[str]) -> str:
-    version_path = ROOT / "VERSION"
+    version_path = ROOT / "VERSION.txt"
     try:
         version = version_path.read_text(encoding="utf-8").strip()
     except OSError as exc:
-        blockers.append(f"VERSION cannot be loaded: {exc}")
+        blockers.append(f"VERSION.txt cannot be loaded: {exc}")
         return ""
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
-        blockers.append("VERSION must contain one semantic version")
+        blockers.append("VERSION.txt must contain one semantic version")
         return version
 
     skill_text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
     if f"# MoSoCanvas v{version}" not in skill_text:
-        blockers.append("SKILL.md title does not match VERSION")
+        blockers.append("SKILL.md title does not match VERSION.txt")
     evals = load_json(ROOT / "evals" / "evals.json", blockers)
     if isinstance(evals, dict) and evals.get("suite") != f"mosocanvas-v{version}":
-        blockers.append("eval suite version does not match VERSION")
+        blockers.append("eval suite version does not match VERSION.txt")
     return version
 
 

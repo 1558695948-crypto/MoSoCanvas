@@ -1,0 +1,73 @@
+{
+  "schema": "moso.feedback-delta/0.1",
+  "id": "canvas-cat-wing-delta-01",
+  "task_id": "mosocanvas-tar-astronaut-poster",
+  "created_at": "2026-08-09T18:01:00+08:00",
+  "source": {
+    "kind": "user-feedback",
+    "message_ref": "codex://message/cat-wing-feedback",
+    "summary": "Reduce the tar cat's wings while preserving the person and MoSoCanvas typography."
+  },
+  "parent": {
+    "spec_ref": "visual-spec-v7",
+    "spec_version": 7,
+    "checkpoint_ref": "codex://artifact/tar-poster-v7",
+    "attempt_id": "repair-07"
+  },
+  "changes": [
+    {
+      "id": "change-wing-scale",
+      "target": "tar cat wings",
+      "instruction": "Reduce both wings and keep their origin anatomically attached to the cat's back.",
+      "reason": "Smaller wings reduce collision with the seated figure and integrate the cat into the composition."
+    }
+  ],
+  "preserve": [
+    {
+      "id": "preserve-person",
+      "target": "seated person",
+      "invariant": "Keep identity, pose, skin, crop, lighting, and silhouette unchanged.",
+      "scale": "all"
+    },
+    {
+      "id": "preserve-typography",
+      "target": "MoSoCanvas title and orbital line",
+      "invariant": "Keep wording, capitalization, geometry, spacing, position, and tonal treatment unchanged.",
+      "scale": "all"
+    }
+  ],
+  "prohibit": [
+    {
+      "id": "avoid-arm-overlap",
+      "outcome": "The reduced wings still overlap a large portion of the person's arm.",
+      "consequence": "The cat remains visually pasted on and the foreground hierarchy stays confused."
+    }
+  ],
+  "relationships": [
+    {
+      "id": "relation-calm-threat",
+      "subject": "aggressive tar cat",
+      "relation": "contrasts with but does not occlude",
+      "object": "calm seated person",
+      "intended_effect": "The cat supplies alert tension while the person remains the quiet primary mass.",
+      "scale": "use-scale",
+      "pass_condition": "The cat reads as tense at normal size, while the person's arm silhouette remains substantially unobstructed."
+    }
+  ],
+  "promotions": [],
+  "verification": [
+    {
+      "id": "check-wing-change",
+      "covers": ["change-wing-scale", "avoid-arm-overlap", "relation-calm-threat"],
+      "method": "Compare parent and child at use scale and inspect the cat-person boundary.",
+      "pass_condition": "Both wings are visibly smaller and no large overlap with the arm remains."
+    },
+    {
+      "id": "check-protected-content",
+      "covers": ["preserve-person", "preserve-typography"],
+      "method": "Overlay the child against the parent and visually inspect identity and title geometry.",
+      "pass_condition": "No visible drift appears in the seated person, title, or orbital line."
+    }
+  ],
+  "confirmation_status": "confirmed"
+}

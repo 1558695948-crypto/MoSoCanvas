@@ -62,7 +62,7 @@ class EvidenceRegistryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             state = Path(directory) / "run-state.json"
             write_json(state, {
-                "schema": "moso.run-state/0.4",
+                "schema": "moso.run-state/0.6",
                 "task_id": "fake-accept",
                 "mode": "direction",
                 "phase": "accept",
@@ -94,6 +94,200 @@ class EvidenceRegistryTests(unittest.TestCase):
             self.assertEqual(result.returncode, 1)
             self.assertIn("user_decision_ref", result.stdout)
             self.assertIn("local evidence registry", result.stdout)
+
+
+class FeedbackAndAttemptGateTests(unittest.TestCase):
+    def test_feedback_example_has_complete_verification_coverage(self) -> None:
+        example = SKILL / "examples" / "feedback-delta.example.json"
+        result = run_script("feedback_validate.py", example)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_feedback_without_coverage_is_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            value = json.loads(
+                (SKILL / "examples" / "feedback-delta.example.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            value["verification"][0]["covers"].remove("change-overlap")
+            path = root / "feedback.json"
+            write_json(path, value)
+            result = run_script("feedback_validate.py", path)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("lack verification", result.stdout)
+
+    def test_immediate_attempt_review_does_not_require_independent_reviewer(self) -> None:
+        example = SKILL / "examples" / "attempt-review.example.json"
+        result = run_script("attempt_review_validate.py", example)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_unreviewed_attempt_blocks_next_generation(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            brief = {
+                "objective": "Test one variable.",
+                "viewer_position": "front",
+                "first_read": "subject",
+                "composition_geometry": "single mass",
+                "narrative_beat": "pause",
+                "color_light_logic": "one light",
+                "required_content": ["subject"],
+                "protected_content": ["frame"],
+                "main_risk": "no visible change",
+                "communicated_to_user": True,
+            }
+            state = root / "run-state.json"
+            write_json(state, {
+                "schema": "moso.run-state/0.6",
+                "task_id": "gate-test",
+                "mode": "repair",
+                "phase": "preflight",
+                "spec_ref": "spec",
+                "approved_checkpoint": {
+                    "source_ref": "codex://artifact/approved",
+                    "role": "approved-output",
+                },
+                "lineage": {
+                    "parent_ref": "codex://artifact/approved",
+                    "operation": "masked-generative",
+                },
+                "allowed_changes": ["target variable"],
+                "protected_elements": ["frame"],
+                "attempt_budget": {
+                    "generative": 0,
+                    "generative_used": 0,
+                    "repair": 2,
+                    "repair_used": 1,
+                },
+                "output_requirements": {"carrier": "social", "frame_count": 1},
+                "verification": [{
+                    "check": "target",
+                    "method": "actual artifact inspection",
+                    "status": "pending",
+                }],
+                "direction_approval_status": "approved",
+                "quality_status": {
+                    "use_scale": "pending",
+                    "detail_scale": "pending",
+                    "protected_drift": "pending",
+                    "trajectory": "pending",
+                    "independent_review": "pending",
+                    "user_acceptance": "pending",
+                },
+                "generation_attempts": [
+                    {
+                        "attempt_id": "a1",
+                        "status": "generated",
+                        "trajectory_response": "initial",
+                        "trajectory_reason": "first repair",
+                        "pre_generation_brief": brief,
+                        "execution": {
+                            "backend": "test",
+                            "interface": "fixture",
+                            "model": "fixture",
+                            "model_version": "1",
+                            "prompt_ref": "prompt-a1",
+                            "prompt_sha256": "0" * 64,
+                            "parameters": {},
+                            "generated_at": "2026-08-09T00:00:00Z",
+                            "output_ref": "artifact-a1",
+                        },
+                    },
+                    {
+                        "attempt_id": "a2",
+                        "status": "planned",
+                        "trajectory_response": "continue",
+                        "trajectory_reason": "retry",
+                        "pre_generation_brief": brief,
+                    },
+                ],
+            })
+            result = run_script("preflight_validate.py", state)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("reviewed before another generation", result.stdout)
+
+    def test_identical_images_are_flagged_as_very_low_delta(self) -> None:
+        try:
+            from PIL import Image
+        except ImportError:
+            self.skipTest("Pillow unavailable")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            left = root / "left.png"
+            right = root / "right.png"
+            Image.new("RGB", (32, 32), (20, 30, 40)).save(left)
+            Image.new("RGB", (32, 32), (20, 30, 40)).save(right)
+            result = run_script(
+                "compare_attempts.py", left, right,
+                "--id", "comparison", "--target-variable", "material",
+            )
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            report = json.loads(result.stdout)
+            self.assertEqual(
+                report["automated_delta"]["diagnostic_flag"], "very-low-delta"
+            )
+            self.assertEqual(report["target_change"]["status"], "unreviewed")
+
+
+class NativeCanvasIntegrationTests(unittest.TestCase):
+    def test_semantic_canvas_feedback_example_passes(self) -> None:
+        example = SKILL / "examples" / "native-canvas-feedback.example.json"
+        result = run_script("native_canvas_validate.py", example)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_pixel_bounded_claim_without_geometry_is_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            value = json.loads(
+                (SKILL / "examples" / "native-canvas-feedback.example.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            value["execution_scope"] = "pixel-bounded-edit"
+            path = root / "canvas-feedback.json"
+            write_json(path, value)
+            result = run_script("native_canvas_validate.py", path)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("requires a real mask", result.stdout)
+
+    def test_multi_select_edit_requires_one_delta_per_parent(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            value = json.loads(
+                (SKILL / "examples" / "native-canvas-feedback.example.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            value["interaction"]["kind"] = "multi-select-comment"
+            value["bindings"].append({
+                "artifact_ref": "codex://artifact/tar-poster-v6",
+                "attempt_id": "repair-06",
+                "role": "edit-parent",
+                "feedback_delta_ref": value["bindings"][0]["feedback_delta_ref"],
+            })
+            path = root / "canvas-feedback.json"
+            write_json(path, value)
+            result = run_script("native_canvas_validate.py", path)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("distinct feedback delta", result.stdout)
+
+    def test_preflight_requires_canvas_linked_delta_on_same_attempt(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            state_value = json.loads(
+                (SKILL / "examples" / "repair-run-state.example.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            state_value["generation_attempts"][0]["native_canvas_feedback_refs"] = [
+                str(SKILL / "examples" / "native-canvas-feedback.example.json")
+            ]
+            state = root / "run-state.json"
+            write_json(state, state_value)
+            result = run_script("preflight_validate.py", state)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("links deltas not attached to the same run/attempt", result.stdout)
 
 
 class ReviewIntegrityTests(unittest.TestCase):
@@ -259,30 +453,38 @@ class ReviewIntegrityTests(unittest.TestCase):
                 "decided_at": "2026-07-28T00:11:00Z",
                 "actor": "user",
             })
-            self_review = root / "self-review.json"
-            self_review_value = json.loads(review.read_text(encoding="utf-8"))
-            self_review_value["id"] = "self-review"
-            self_review_value.pop("artifact_sha256", None)
-            self_review_value["reviewer"] = {
-                "kind": "same-context-assistive",
-                "independent_from_generation": False,
-                "actual_artifact_inspected": True,
+            attempt_review = root / "attempt-review.json"
+            write_json(attempt_review, {
+                "schema": "moso.attempt-review/0.1",
+                "id": "attempt-review",
+                "attempt_id": "attempt-1",
+                "artifact_ref": "artifact",
                 "reviewed_at": "2026-07-28T00:05:00Z",
-            }
-            self_review_value["decision"] = {
-                "recommendation": "user-judgment",
-                "release_authorized": False,
-                "priority_improvement": "Send to an independent reviewer.",
-                "remaining_risks": [],
-            }
-            write_json(self_review, self_review_value)
+                "actual_artifact_inspected": True,
+                "scales": ["use-scale", "full-frame"],
+                "strengths": ["The selected restraint remains visible."],
+                "deviations": [],
+                "technical_risks": [],
+                "target_change": {
+                    "variable": "produce the selected shot",
+                    "status": "achieved",
+                    "evidence": "The artifact contains the selected central dark mass.",
+                },
+                "protected_drift": {
+                    "status": "none",
+                    "evidence": "This is the first attempt.",
+                },
+                "priority_improvement": "Preserve restraint during release preparation.",
+                "recommendation": "accept",
+                "communicated_to_user": True,
+            })
             registry_value = json.loads(registry.read_text(encoding="utf-8"))
             for entry_id, kind, path, media_type in (
                 ("prompt", "prompt", prompt, "text/plain"),
                 ("proof", "composition-proof", proof, "image/svg+xml"),
                 ("shot", "shot-plan", shot, "application/json"),
                 ("decision", "user-decision", decision, "application/json"),
-                ("self-review", "artifact-review", self_review, "application/json"),
+                ("attempt-review", "attempt-review", attempt_review, "application/json"),
             ):
                 registry_value["entries"].append({
                     "id": entry_id,
@@ -297,7 +499,7 @@ class ReviewIntegrityTests(unittest.TestCase):
 
             state = root / "run-state.json"
             write_json(state, {
-                "schema": "moso.run-state/0.4",
+                "schema": "moso.run-state/0.6",
                 "task_id": "task",
                 "mode": "direction",
                 "phase": "accept",
@@ -323,8 +525,10 @@ class ReviewIntegrityTests(unittest.TestCase):
                 }],
                 "direction_approval_status": "approved",
                 "generation_attempts": [{
-                    "id": "attempt-1",
+                    "attempt_id": "attempt-1",
                     "status": "reviewed",
+                    "trajectory_response": "initial",
+                    "trajectory_reason": "This is the first attempt.",
                     "pre_generation_brief": {
                         "objective": "Produce the selected shot.",
                         "viewer_position": "front",
@@ -348,7 +552,7 @@ class ReviewIntegrityTests(unittest.TestCase):
                         "generated_at": "2026-07-28T00:00:00Z",
                         "output_ref": "artifact",
                     },
-                    "self_review_ref": "self-review",
+                    "attempt_review_ref": "attempt-review",
                     "independent_review_ref": "review",
                 }],
                 "quality_status": {
@@ -461,6 +665,31 @@ class TrendIntegrityTests(unittest.TestCase):
             self.assertIn("lacks cross-domain corroboration", result.stdout)
             self.assertIn("lacks independent creator", result.stdout)
             self.assertIn("claims velocity without", result.stdout)
+
+
+class SameBackendAblationTests(unittest.TestCase):
+    def test_example_is_valid_but_cannot_support_a_claim(self) -> None:
+        result = run_script(
+            "ablation_score.py", SKILL / "examples" / "skill-ablation-study.example.json"
+        )
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["status"], "instrumentation-only")
+        self.assertIn("No contribution claim", report["claim"])
+
+    def test_unequal_generation_budget_is_blocked(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            study = Path(directory) / "study.json"
+            value = json.loads(
+                (SKILL / "examples" / "skill-ablation-study.example.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            value["tasks"][0]["runs"][2]["generation_calls"] = 4
+            write_json(study, value)
+            result = run_script("ablation_score.py", study)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("equal generation budget", result.stdout)
 
 
 class BenchmarkIntegrityTests(unittest.TestCase):

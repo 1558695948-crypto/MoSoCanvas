@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2080" height="960" viewBox="0 0 520 240">
+  <g transform="translate(10 0)" fill="#17343b">
+    <text x="0" y="220" font-family="SignPainter" font-size="230">MoSo</text>
+    <path d="M385 174 C410 189 423 166 442 171 C458 174 464 185 481 183"
+          fill="none" stroke="#17343b" stroke-width="7.5" stroke-linecap="round"/>
+  </g>
+</svg>

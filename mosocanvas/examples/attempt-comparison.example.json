@@ -1,0 +1,24 @@
+{
+  "schema": "moso.attempt-comparison/0.1",
+  "id": "train-window-v6-v7-comparison",
+  "parent_artifact_ref": "codex://artifact/train-window-v6",
+  "candidate_artifact_ref": "codex://artifact/train-window-v7",
+  "target_variable": "replace tangled ghost linework with cleaner vapor material",
+  "automated_delta": {
+    "normalized_color_mae": 0.0133,
+    "normalized_luminance_mae": 0.013511,
+    "edge_mae": 0.024184,
+    "average_hash_distance": 3,
+    "diagnostic_flag": "low-delta",
+    "not_semantic_proof": true
+  },
+  "target_change": {
+    "status": "missed",
+    "evidence": "The ghost remains defined by the same continuous filament network at full-frame and detail scale."
+  },
+  "protected_drift": {
+    "status": "within-tolerance",
+    "evidence": "The carriage, figure pose, and main light paths remain stable."
+  },
+  "trajectory_decision": "change-method"
+}

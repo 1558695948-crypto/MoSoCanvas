@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/skill-ablation-study-0.1.json",
+  "title": "MoSoCanvas Same-backend Ablation Study 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "protocol", "thresholds", "tasks", "blind_preferences"],
+  "properties": {
+    "schema": { "const": "moso.skill-ablation-study/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "backend", "model_version", "captured_at", "same_backend", "same_model_version",
+        "same_source_brief", "same_input_assets", "same_generation_budget",
+        "condition_order_randomized", "raters_blind_to_condition", "criteria_preregistered"
+      ],
+      "properties": {
+        "backend": { "type": "string", "minLength": 1 },
+        "model_version": { "type": "string", "minLength": 1 },
+        "captured_at": { "type": "string", "format": "date-time" },
+        "same_backend": { "const": true },
+        "same_model_version": { "const": true },
+        "same_source_brief": { "const": true },
+        "same_input_assets": { "const": true },
+        "same_generation_budget": { "const": true },
+        "condition_order_randomized": { "const": true },
+        "raters_blind_to_condition": { "const": true },
+        "criteria_preregistered": { "const": true }
+      }
+    },
+    "thresholds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimum_pilot_tasks", "minimum_claim_tasks", "minimum_raters"],
+      "properties": {
+        "minimum_pilot_tasks": { "type": "integer", "minimum": 5 },
+        "minimum_claim_tasks": { "type": "integer", "minimum": 20 },
+        "minimum_raters": { "type": "integer", "minimum": 3 }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["task_id", "task_class", "brief_ref", "runs"],
+        "properties": {
+          "task_id": { "type": "string", "minLength": 1 },
+          "task_class": { "type": "string", "minLength": 1 },
+          "brief_ref": { "type": "string", "minLength": 1 },
+          "runs": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": { "$ref": "#/$defs/run" }
+          }
+        }
+      }
+    },
+    "blind_preferences": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["comparison_id", "task_id", "rater_id", "condition_a", "condition_b", "winner"],
+        "properties": {
+          "comparison_id": { "type": "string", "minLength": 1 },
+          "task_id": { "type": "string", "minLength": 1 },
+          "rater_id": { "type": "string", "minLength": 1 },
+          "condition_a": { "$ref": "#/$defs/condition" },
+          "condition_b": { "$ref": "#/$defs/condition" },
+          "winner": { "enum": ["a", "b", "tie"] },
+          "reason": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "condition": { "enum": ["B0-direct", "B1-generic-clarify", "M0-mosocanvas"] },
+    "run": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition", "artifact_ref", "generation_calls", "elapsed_minutes", "accepted",
+        "rounds_to_acceptance", "material_user_corrections", "protected_decision_losses",
+        "severity3_defects"
+      ],
+      "properties": {
+        "condition": { "$ref": "#/$defs/condition" },
+        "artifact_ref": { "type": "string", "minLength": 1 },
+        "generation_calls": { "type": "integer", "minimum": 1 },
+        "elapsed_minutes": { "type": "number", "minimum": 0 },
+        "accepted": { "type": "boolean" },
+        "rounds_to_acceptance": { "type": ["integer", "null"], "minimum": 1 },
+        "material_user_corrections": { "type": "integer", "minimum": 0 },
+        "protected_decision_losses": { "type": "integer", "minimum": 0 },
+        "severity3_defects": { "type": "integer", "minimum": 0 },
+        "analysis_usefulness": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 },
+        "interaction_friction": { "type": ["integer", "null"], "minimum": 1, "maximum": 5 }
+      }
+    }
+  }
+}

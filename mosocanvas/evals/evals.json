@@ -1,8 +1,54 @@
 {
-  "suite": "mosocanvas-v1.1.0",
+  "suite": "mosocanvas-v1.3.0",
   "scope": "campaign key visuals, posters, and physical promotional collateral",
   "conditions": ["B0-direct", "B1-generic-clarify-first", "M0-mosocanvas"],
   "cases": [
+    {
+      "id": "feedback-delta-preserves-relations",
+      "input": "第二张脸错位太大；第一眼要先看到一个人，仔细看才发现两个人。人物、字体和环形线都不要变。",
+      "fixtures": ["approved parent image", "prior visual spec"],
+      "expected": [
+        "binds the correction to the approved parent and current spec",
+        "separates the overlap change from protected portrait, typography, and orbital-line invariants",
+        "records the first-read versus second-read relationship with thumbnail and use-scale pass conditions",
+        "names both four-equally-strong-eyes and invisible-second-face as prohibited outcomes"
+      ],
+      "forbidden": [
+        "appending the correction only to a prompt",
+        "changing protected typography or the primary portrait",
+        "describing two portraits only as an object count"
+      ]
+    },
+    {
+      "id": "attempt-review-before-next-generation",
+      "input": "上一张刚生成完，再试一张。",
+      "fixtures": ["one generated artifact without an immediate attempt review"],
+      "expected": [
+        "inspects the actual previous artifact before another image call",
+        "records strengths, deviations, technical risks, target-change status, protected drift, and one priority improvement",
+        "communicates the review to the user"
+      ],
+      "forbidden": [
+        "starting another generation while the previous attempt remains generated but unreviewed",
+        "requiring an independent blind reviewer for a discarded exploration candidate"
+      ]
+    },
+    {
+      "id": "near-duplicate-stall-routing",
+      "input": "连续两版说要改幽灵材质，但几乎没变，再继续调一下提示词。",
+      "fixtures": ["two parent-bound attempts", "low automated visual delta", "two missed target-change reviews"],
+      "expected": [
+        "states that automated similarity is diagnostic rather than semantic proof",
+        "rejects another same-method micro-prompt iteration",
+        "routes to change-method or branch from a clean checkpoint",
+        "preserves accepted composition unless the branch explicitly reopens it"
+      ],
+      "forbidden": [
+        "claiming low pixel delta alone proves failure",
+        "continuing the same method after two missed target changes",
+        "treating cosmetic particle changes as material success"
+      ]
+    },
     {
       "id": "generation-bookends",
       "input": "用这张参考图的视觉机制生成一张横版 MoSoCanvas 宣传图。",
@@ -393,7 +439,7 @@
       "input": "检查这个旧 run-state：phase 是 accept，但 user_acceptance 仍是 pending，而且只有生成者自己的 post_generation_review。",
       "fixtures": ["moso.run-state/0.3 legacy state"],
       "expected": [
-        "blocks acceptance and requires migration to run-state 0.4",
+        "blocks acceptance and requires migration to run-state 0.6",
         "requires actual user acceptance",
         "requires an independent artifact review reference",
         "states that structural validation does not prove aesthetic quality"
@@ -401,6 +447,71 @@
       "forbidden": [
         "passing because approval_status is approved",
         "passing because inspected_actual_output is true"
+      ]
+    },
+    {
+      "id": "native-canvas-focused-comment-binding",
+      "input": "我在 Codex Canvas 里点开 v7 评论：猫的翅膀缩小，人物和字体不要变。继续修。",
+      "fixtures": ["one focused Canvas artifact", "host exposes no machine-readable selection geometry"],
+      "expected": [
+        "binds the comment to v7 as the explicit edit parent",
+        "classifies the target as a semantic local region rather than claiming a mask",
+        "compiles change and preservation constraints into a parent-bound Feedback Delta",
+        "shows the compact contract before generation",
+        "returns parent and child for post-generation comparison"
+      ],
+      "forbidden": [
+        "claiming that a Canvas comment provides exact pixel coordinates",
+        "editing an unbound latest image",
+        "changing the person or typography without authorization"
+      ]
+    },
+    {
+      "id": "native-canvas-multiselect-edit-binding",
+      "input": "我多选 v5 和 v7 评论：两张都把红光减弱一点，但各自其他内容保留。",
+      "expected": [
+        "treats v5 and v7 as separate edit parents",
+        "creates a distinct Feedback Delta for each parent",
+        "preserves separate lineage and does not merge the image states",
+        "asks one clarification only if the intended output count or parent role remains ambiguous"
+      ],
+      "forbidden": [
+        "using one mutable delta for both parent artifacts",
+        "assuming the latest image is the only parent",
+        "silently combining both compositions"
+      ]
+    },
+    {
+      "id": "native-canvas-false-mask-claim",
+      "input": "我已经在 Canvas 里说了‘这里’，直接做像素级局部修复，外面必须一个像素不变。",
+      "fixtures": ["host selection geometry and mask are unavailable to the Skill"],
+      "expected": [
+        "states that the visible Canvas interaction is not a machine-readable mask",
+        "blocks a pixel-bounded guarantee",
+        "offers a semantic local edit or requests a real annotation or mask",
+        "keeps the limitation in the adapter record"
+      ],
+      "forbidden": [
+        "inventing coordinates",
+        "promising outside-mask pixel equality without a mask",
+        "treating user confidence as tool capability"
+      ]
+    },
+    {
+      "id": "same-backend-contribution-ablation",
+      "input": "这些图不错，证明 MoSoCanvas 有贡献了吗？请和直接使用同一个 GPT Image 做公平验证。",
+      "expected": [
+        "separates backend quality from workflow contribution",
+        "defines B0 direct, B1 generic clarification, and M0 MoSoCanvas conditions",
+        "holds backend, model version, source brief, assets, and generation budget constant",
+        "uses blind artifact preference and reports acceptance, corrections, protected losses, severe defects, time, usefulness, and friction separately",
+        "treats five to ten tasks as instrumentation only and withholds a contribution claim"
+      ],
+      "forbidden": [
+        "claiming contribution from one successful image",
+        "weakening the direct-generation baseline",
+        "combining all outcomes into one aesthetic score",
+        "using a different image backend for a condition"
       ]
     },
     {

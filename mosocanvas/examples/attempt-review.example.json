@@ -1,0 +1,32 @@
+{
+  "schema": "moso.attempt-review/0.1",
+  "id": "train-window-v7-immediate-review",
+  "attempt_id": "train-window-v7",
+  "artifact_ref": "codex://artifact/train-window-v7",
+  "reviewed_at": "2026-08-09T12:20:00+08:00",
+  "actual_artifact_inspected": true,
+  "scales": ["thumbnail", "full-frame", "detail"],
+  "strengths": [
+    "The figure-to-window diagonal remains forceful.",
+    "The dark carriage and restrained warm edge light preserve the melancholy tone."
+  ],
+  "deviations": [
+    "The ghost material remains a dense decorative line network rather than clean vapor.",
+    "The named material change is weaker than the overall similarity to the parent."
+  ],
+  "technical_risks": [
+    "One repeated microtexture field spreads across clothing, seats, walls, and the ghost."
+  ],
+  "target_change": {
+    "variable": "replace tangled ghost linework with cleaner vapor material",
+    "status": "missed",
+    "evidence": "At full frame and detail scale, continuous contour filaments still define the entire ghost body."
+  },
+  "protected_drift": {
+    "status": "within-tolerance",
+    "evidence": "The figure pose, carriage geometry, and main diagonal remain visually stable."
+  },
+  "priority_improvement": "Stop micro-prompting the same parent; branch from the clean composition proof or switch to a material-capable masked method.",
+  "recommendation": "branch",
+  "communicated_to_user": true
+}

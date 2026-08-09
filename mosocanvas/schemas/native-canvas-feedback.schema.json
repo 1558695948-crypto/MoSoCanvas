@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/native-canvas-feedback-0.1.json",
+  "title": "MoSoCanvas Native Canvas Feedback 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "id", "task_id", "created_at", "host", "interaction", "intent",
+    "execution_scope", "bindings", "region_locators", "binding_status",
+    "user_visible_contract"
+  ],
+  "properties": {
+    "schema": { "const": "moso.native-canvas-feedback/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "task_id": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "surface", "structured_selection_available"],
+      "properties": {
+        "product": { "const": "codex" },
+        "surface": { "enum": ["image-canvas", "focused-view", "chat-fallback"] },
+        "structured_selection_available": { "type": "boolean" },
+        "selection_payload_ref": { "type": "string", "minLength": 1 }
+      }
+    },
+    "interaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "message_ref", "comment_text"],
+      "properties": {
+        "kind": { "enum": ["comment", "multi-select-comment", "focused-comment", "chat-fallback"] },
+        "message_ref": { "type": "string", "minLength": 1 },
+        "comment_text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "intent": { "enum": ["edit", "compare", "select", "accept", "reject"] },
+    "execution_scope": {
+      "enum": ["whole-image-guidance", "semantic-local-edit", "pixel-bounded-edit", "compare-only", "decision-only"]
+    },
+    "bindings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_ref", "role"],
+        "properties": {
+          "artifact_ref": { "type": "string", "minLength": 1 },
+          "attempt_id": { "type": "string", "minLength": 1 },
+          "sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
+          "role": { "enum": ["edit-parent", "comparison-candidate", "reference", "decision-target"] },
+          "feedback_delta_ref": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "region_locators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "target_label", "kind", "machine_geometry_available", "user_confirmed"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "target_label": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["host-selection", "normalized-box", "normalized-polygon", "grid-region", "natural-language", "mask"] },
+          "machine_geometry_available": { "type": "boolean" },
+          "user_confirmed": { "type": "boolean" },
+          "normalized_box": {
+            "type": "array", "minItems": 4, "maxItems": 4,
+            "items": { "type": "integer", "minimum": 0, "maximum": 1000 }
+          },
+          "normalized_polygon": {
+            "type": "array", "minItems": 3,
+            "items": {
+              "type": "array", "minItems": 2, "maxItems": 2,
+              "items": { "type": "integer", "minimum": 0, "maximum": 1000 }
+            }
+          },
+          "grid_region": { "enum": ["top-left", "top", "top-right", "left", "center", "right", "bottom-left", "bottom", "bottom-right"] },
+          "mask_ref": { "type": "string", "minLength": 1 },
+          "fallback_description": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "binding_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "confidence", "reason"],
+      "properties": {
+        "status": { "enum": ["bound", "ambiguous", "unbound"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "user_visible_contract": { "const": true },
+    "known_limitations": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

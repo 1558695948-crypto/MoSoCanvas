@@ -38,9 +38,9 @@ def main() -> int:
     parser.add_argument("--source-label", default=".agents/skills/mosocanvas")
     args = parser.parse_args()
 
-    version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+    version = (ROOT / "VERSION.txt").read_text(encoding="utf-8").strip()
     if not version or any(not part.isdigit() for part in version.split(".")):
-        raise ValueError("VERSION must be a semantic version")
+        raise ValueError("VERSION.txt must be a semantic version")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     archive = args.output_dir / f"mosocanvas-{version}.zip"
     manifest_path = args.output_dir / f"mosocanvas-{version}.manifest.json"
