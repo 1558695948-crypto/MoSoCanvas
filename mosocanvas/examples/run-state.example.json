@@ -1,5 +1,5 @@
 {
-  "schema": "moso.run-state/0.4",
+  "schema": "moso.run-state/0.6",
   "task_id": "example-observer-series",
   "mode": "production",
   "phase": "preflight",
@@ -46,6 +46,8 @@
     {
       "attempt_id": "frame-02-a1",
       "status": "planned",
+      "trajectory_response": "initial",
+      "trajectory_reason": "This is the first attempt for the selected frame.",
       "pre_generation_brief": {
         "objective": "Show the exchange as a calm system larger than one person.",
         "viewer_position": "above the scene as if reading an administrative diagram",

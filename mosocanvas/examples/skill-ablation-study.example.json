@@ -1,0 +1,37 @@
+{
+  "schema": "moso.skill-ablation-study/0.1",
+  "id": "ablation-pilot-001",
+  "protocol": {
+    "backend": "gpt-image",
+    "model_version": "record-exact-host-surface-at-run-time",
+    "captured_at": "2026-08-09T10:00:00+08:00",
+    "same_backend": true,
+    "same_model_version": true,
+    "same_source_brief": true,
+    "same_input_assets": true,
+    "same_generation_budget": true,
+    "condition_order_randomized": true,
+    "raters_blind_to_condition": true,
+    "criteria_preregistered": true
+  },
+  "thresholds": {
+    "minimum_pilot_tasks": 5,
+    "minimum_claim_tasks": 20,
+    "minimum_raters": 3
+  },
+  "tasks": [
+    {
+      "task_id": "poster-001",
+      "task_class": "reference-led campaign image",
+      "brief_ref": "briefs/poster-001.md",
+      "runs": [
+        {"condition": "B0-direct", "artifact_ref": "artifacts/b0.png", "generation_calls": 3, "elapsed_minutes": 12, "accepted": false, "rounds_to_acceptance": null, "material_user_corrections": 3, "protected_decision_losses": 1, "severity3_defects": 1, "analysis_usefulness": null, "interaction_friction": 2},
+        {"condition": "B1-generic-clarify", "artifact_ref": "artifacts/b1.png", "generation_calls": 3, "elapsed_minutes": 16, "accepted": true, "rounds_to_acceptance": 3, "material_user_corrections": 2, "protected_decision_losses": 1, "severity3_defects": 0, "analysis_usefulness": 3, "interaction_friction": 3},
+        {"condition": "M0-mosocanvas", "artifact_ref": "artifacts/m0.png", "generation_calls": 3, "elapsed_minutes": 18, "accepted": true, "rounds_to_acceptance": 2, "material_user_corrections": 1, "protected_decision_losses": 0, "severity3_defects": 0, "analysis_usefulness": 4, "interaction_friction": 3}
+      ]
+    }
+  ],
+  "blind_preferences": [
+    {"comparison_id": "cmp-001", "task_id": "poster-001", "rater_id": "rater-01", "condition_a": "B0-direct", "condition_b": "M0-mosocanvas", "winner": "b", "reason": "The selected artifact has clearer hierarchy and fewer visible material defects."}
+  ]
+}

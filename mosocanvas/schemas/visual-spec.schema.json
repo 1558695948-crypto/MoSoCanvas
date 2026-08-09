@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mosocanvas.local/schemas/visual-spec-0.3.json",
-  "title": "MoSoCanvas Visual Spec 0.3",
+  "$id": "https://mosocanvas.local/schemas/visual-spec-0.4.json",
+  "title": "MoSoCanvas Visual Spec 0.4",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "id", "version", "task", "proposition", "viewer_contract", "hierarchy", "constraints", "strategy", "evaluation"],
   "properties": {
-    "schema": { "const": "moso.visual-spec/0.3" },
+    "schema": { "const": "moso.visual-spec/0.4" },
     "id": { "type": "string", "minLength": 1 },
     "version": { "type": "integer", "minimum": 1 },
     "parent_version": { "type": "integer", "minimum": 1 },
@@ -61,6 +61,38 @@
         "must_include": { "$ref": "#/$defs/stringArray" },
         "must_avoid": { "$ref": "#/$defs/stringArray" },
         "preserve": { "$ref": "#/$defs/stringArray" }
+      }
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "subject", "relation", "object", "intended_effect", "scale", "pass_condition"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "subject": { "type": "string", "minLength": 1 },
+          "relation": { "type": "string", "minLength": 1 },
+          "object": { "type": "string", "minLength": 1 },
+          "intended_effect": { "type": "string", "minLength": 1 },
+          "scale": { "enum": ["thumbnail", "use-scale", "full-frame", "detail", "print-distance", "all"] },
+          "pass_condition": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "perceptual_reveals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "element", "first_detectable_at", "must_not_dominate_at", "pass_condition"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "element": { "type": "string", "minLength": 1 },
+          "first_detectable_at": { "enum": ["thumbnail", "use-scale", "full-frame", "detail"] },
+          "must_not_dominate_at": { "enum": ["thumbnail", "use-scale", "full-frame", "detail", "never"] },
+          "pass_condition": { "type": "string", "minLength": 1 }
+        }
       }
     },
     "strategy": {

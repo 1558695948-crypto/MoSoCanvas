@@ -1,0 +1,58 @@
+{
+  "asset_id": "moso-echo-signature-v1",
+  "display_name": "MoSo 回声笔迹",
+  "status": "approved",
+  "approved_on": "2026-07-28",
+  "canonical_vector": {
+    "dark": "moso-echo-signature-dark.xml",
+    "light": "moso-echo-signature-light.xml",
+    "format": "SVG markup stored as XML for text-only distribution"
+  },
+  "runtime_raster": {
+    "format": "transparent PNG",
+    "policy": "render deterministically from the canonical vector; never synthesize"
+  },
+  "editable_source": {
+    "dark": "moso-echo-signature-dark.xml",
+    "light": "moso-echo-signature-light.xml",
+    "font_dependency": "SignPainter-HouseScript Regular"
+  },
+  "colors": {
+    "dark": "#17343B",
+    "light": "#EFE4CD"
+  },
+  "placement": {
+    "preferred_corner": "bottom-right",
+    "alternate_corner": "bottom-left",
+    "visible_mark_width_percent": {
+      "min": 4,
+      "preferred": 4.5,
+      "max": 5
+    },
+    "edge_margin_percent": {
+      "min": 2.25,
+      "preferred": 2.75,
+      "max": 3.5
+    },
+    "opacity_percent": {
+      "min": 60,
+      "preferred": 66,
+      "max": 70
+    }
+  },
+  "rules": {
+    "default_for": "final MoSo-authored social images and image series",
+    "do_not_use_when": [
+      "the user explicitly requests no signature or watermark",
+      "the carrier requires a clean master",
+      "a client brand system prohibits secondary marks",
+      "the mark would overlap a face, essential text, or narrative evidence"
+    ],
+    "never": [
+      "regenerate or redraw the signature with an image model",
+      "stretch, rotate, outline, shadow, glow, or recolor outside the approved variants",
+      "place both color variants on one image",
+      "treat the signature as the first-read element"
+    ]
+  }
+}

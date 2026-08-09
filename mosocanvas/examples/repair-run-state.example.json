@@ -1,5 +1,5 @@
 {
-  "schema": "moso.run-state/0.4",
+  "schema": "moso.run-state/0.6",
   "task_id": "example-multi-round-repair",
   "mode": "repair",
   "phase": "preflight",
@@ -50,6 +50,8 @@
     {
       "attempt_id": "repair-v4-a1",
       "status": "planned",
+      "trajectory_response": "initial",
+      "trajectory_reason": "This is the first bounded repair attempt from the approved checkpoint.",
       "pre_generation_brief": {
         "objective": "Remove synthetic skin pattern without changing identity or pose.",
         "viewer_position": "unchanged from the approved checkpoint",

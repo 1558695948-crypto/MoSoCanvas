@@ -1,5 +1,5 @@
 {
-  "schema": "moso.visual-spec/0.3",
+  "schema": "moso.visual-spec/0.4",
   "id": "example-zero-reference-observer-series",
   "version": 1,
   "task": {
@@ -30,6 +30,26 @@
     "must_avoid": ["generic glowing orb", "decorative portal", "random eyes and data glyphs"],
     "preserve": ["3:4 carrier", "controlled ambiguity", "credible ordinary physics outside the designed anomaly"]
   },
+  "relationships": [
+    {
+      "id": "observer-after-accident",
+      "subject": "ordinary accident",
+      "relation": "dominates before revealing",
+      "object": "nonhuman observer",
+      "intended_effect": "The viewer first understands a familiar event, then discovers that attention is being returned.",
+      "scale": "use-scale",
+      "pass_condition": "The accident remains the first read while the observer is found on a second look."
+    }
+  ],
+  "perceptual_reveals": [
+    {
+      "id": "observer-discovery-threshold",
+      "element": "nonhuman observer",
+      "first_detectable_at": "use-scale",
+      "must_not_dominate_at": "thumbnail",
+      "pass_condition": "The observer is absent from the first thumbnail read but discoverable without zooming at normal display size."
+    }
+  ],
   "strategy": {
     "selected_direction": "Ordinary spaces behave as if an absent intelligence has already arranged the reply.",
     "structural_mechanisms": [

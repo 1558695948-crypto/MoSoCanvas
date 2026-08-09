@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/attempt-comparison-0.1.json",
+  "title": "MoSoCanvas Attempt Comparison 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "id",
+    "parent_artifact_ref",
+    "candidate_artifact_ref",
+    "target_variable",
+    "automated_delta",
+    "target_change",
+    "protected_drift",
+    "trajectory_decision"
+  ],
+  "properties": {
+    "schema": { "const": "moso.attempt-comparison/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "parent_artifact_ref": { "type": "string", "minLength": 1 },
+    "candidate_artifact_ref": { "type": "string", "minLength": 1 },
+    "target_variable": { "type": "string", "minLength": 1 },
+    "automated_delta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "normalized_color_mae",
+        "normalized_luminance_mae",
+        "edge_mae",
+        "average_hash_distance",
+        "diagnostic_flag",
+        "not_semantic_proof"
+      ],
+      "properties": {
+        "normalized_color_mae": { "type": "number", "minimum": 0, "maximum": 1 },
+        "normalized_luminance_mae": { "type": "number", "minimum": 0, "maximum": 1 },
+        "edge_mae": { "type": "number", "minimum": 0, "maximum": 1 },
+        "average_hash_distance": { "type": "integer", "minimum": 0, "maximum": 64 },
+        "diagnostic_flag": { "enum": ["very-low-delta", "low-delta", "visible-delta", "large-delta"] },
+        "not_semantic_proof": { "const": true }
+      }
+    },
+    "target_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": { "enum": ["unreviewed", "achieved", "partial", "missed", "unobservable"] },
+        "evidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "protected_drift": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": { "enum": ["unreviewed", "none", "within-tolerance", "exceeded", "unobservable"] },
+        "evidence": { "type": "string", "minLength": 1 }
+      }
+    },
+    "trajectory_decision": {
+      "enum": ["needs-visual-review", "continue", "accept", "change-method", "branch", "stop"]
+    }
+  }
+}

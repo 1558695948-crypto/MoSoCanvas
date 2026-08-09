@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mosocanvas.local/schemas/run-state-0.4.json",
-  "title": "MoSoCanvas Run State 0.4",
+  "$id": "https://mosocanvas.local/schemas/run-state-0.6.json",
+  "title": "MoSoCanvas Run State 0.6",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "task_id", "mode", "phase", "approved_checkpoint", "allowed_changes", "protected_elements", "attempt_budget", "output_requirements", "verification", "direction_approval_status", "quality_status"],
   "properties": {
-    "schema": { "const": "moso.run-state/0.4" },
+    "schema": { "const": "moso.run-state/0.6" },
     "task_id": { "type": "string", "minLength": 1 },
     "mode": { "enum": ["direction", "production", "repair", "review", "bypass"] },
     "phase": { "enum": ["route", "proposition", "native-directions", "composition-proof", "freeze", "preflight", "execute", "independent-review", "decision", "accept", "stopped"] },
@@ -14,6 +14,8 @@
     "shot_plan_ref": { "type": "string", "minLength": 1 },
     "series_plan_ref": { "type": "string", "minLength": 1 },
     "evidence_registry_ref": { "type": "string", "minLength": 1 },
+    "feedback_delta_refs": { "$ref": "#/$defs/stringArray" },
+    "native_canvas_feedback_refs": { "$ref": "#/$defs/stringArray" },
     "approved_checkpoint": {
       "type": "object",
       "additionalProperties": false,
@@ -113,10 +115,21 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["attempt_id", "status", "pre_generation_brief"],
+        "required": [
+          "attempt_id",
+          "status",
+          "trajectory_response",
+          "trajectory_reason",
+          "pre_generation_brief"
+        ],
         "properties": {
           "attempt_id": { "type": "string", "minLength": 1 },
+          "parent_attempt_id": { "type": "string", "minLength": 1 },
           "status": { "enum": ["planned", "generated", "reviewed", "rejected"] },
+          "trajectory_response": { "enum": ["initial", "continue", "change-method", "branch"] },
+          "trajectory_reason": { "type": "string", "minLength": 1 },
+          "feedback_delta_refs": { "$ref": "#/$defs/stringArray" },
+          "native_canvas_feedback_refs": { "$ref": "#/$defs/stringArray" },
           "pre_generation_brief": {
             "type": "object",
             "additionalProperties": false,
@@ -167,7 +180,8 @@
               "job_ref": { "type": "string", "minLength": 1 }
             }
           },
-          "self_review_ref": { "type": "string", "minLength": 1 },
+          "attempt_review_ref": { "type": "string", "minLength": 1 },
+          "attempt_comparison_ref": { "type": "string", "minLength": 1 },
           "independent_review_ref": { "type": "string", "minLength": 1 }
         },
         "allOf": [
@@ -177,7 +191,18 @@
           },
           {
             "if": { "properties": { "status": { "const": "reviewed" } } },
-            "then": { "required": ["self_review_ref", "independent_review_ref"] }
+            "then": { "required": ["attempt_review_ref"] }
+          },
+          {
+            "if": { "properties": { "status": { "const": "rejected" } } },
+            "then": { "required": ["attempt_review_ref"] }
+          },
+          {
+            "if": {
+              "properties": { "status": { "enum": ["reviewed", "rejected"] } },
+              "required": ["parent_attempt_id"]
+            },
+            "then": { "required": ["attempt_comparison_ref"] }
           }
         ]
       }

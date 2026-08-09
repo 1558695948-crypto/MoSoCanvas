@@ -1,0 +1,78 @@
+{
+  "schema": "moso.feedback-delta/0.1",
+  "id": "double-portrait-overlap-delta-01",
+  "task_id": "example-double-portrait-poster",
+  "created_at": "2026-08-09T12:00:00+08:00",
+  "source": {
+    "kind": "user-feedback",
+    "message_ref": "codex://message/example-feedback",
+    "summary": "The two portraits are either too separated or too weak; preserve the approved typography and orbital line."
+  },
+  "parent": {
+    "spec_ref": "visual-spec-v2",
+    "spec_version": 2,
+    "checkpoint_ref": "poster-v2",
+    "attempt_id": "portrait-v2"
+  },
+  "changes": [
+    {
+      "id": "change-overlap",
+      "target": "secondary portrait",
+      "instruction": "Reduce displacement and raise visibility until it is discoverable only after the primary face reads.",
+      "reason": "The current four-eye read destroys the intended delayed narrative discovery."
+    }
+  ],
+  "preserve": [
+    {
+      "id": "preserve-title",
+      "target": "MoSoCanvas typography and orbital line",
+      "invariant": "Keep geometry, spacing, position, and tonal relationship unchanged.",
+      "scale": "all"
+    },
+    {
+      "id": "preserve-primary",
+      "target": "primary portrait",
+      "invariant": "Keep identity, crop, expression, and first-read dominance unchanged.",
+      "scale": "all"
+    }
+  ],
+  "prohibit": [
+    {
+      "id": "avoid-four-eyes",
+      "outcome": "Four equally strong eyes appear at thumbnail scale.",
+      "consequence": "The image reads as a malformed face instead of delayed double exposure."
+    },
+    {
+      "id": "avoid-invisible-second-face",
+      "outcome": "The second portrait remains undiscoverable at normal use scale.",
+      "consequence": "The narrative mechanism disappears."
+    }
+  ],
+  "relationships": [
+    {
+      "id": "relation-delayed-discovery",
+      "subject": "primary portrait",
+      "relation": "dominates before revealing",
+      "object": "secondary portrait",
+      "intended_effect": "The viewer first sees one person and then discovers two overlapping identities.",
+      "scale": "use-scale",
+      "pass_condition": "At 160 px the image reads as one face; at normal display size the second face becomes discoverable without producing two separate heads."
+    }
+  ],
+  "promotions": [],
+  "verification": [
+    {
+      "id": "check-overlap",
+      "covers": ["change-overlap", "avoid-four-eyes", "avoid-invisible-second-face", "relation-delayed-discovery"],
+      "method": "Compare 160 px thumbnail and normal-size artifact with the parent checkpoint.",
+      "pass_condition": "The primary face controls first read and the secondary face controls second read."
+    },
+    {
+      "id": "check-preservation",
+      "covers": ["preserve-title", "preserve-primary"],
+      "method": "Overlay comparison against the approved parent.",
+      "pass_condition": "No unapproved geometry or identity drift is visible."
+    }
+  ],
+  "confirmation_status": "confirmed"
+}
