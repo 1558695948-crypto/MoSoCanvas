@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/panel-vote-0.1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema": {
+      "const": "moso.panel-vote/0.1"
+    },
+    "reviewer_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_context_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifact_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "spec_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "seal_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "review_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "review_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "spec_received_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "peer_reviews_hidden": {
+      "const": true
+    }
+  },
+  "required": [
+    "schema",
+    "reviewer_id",
+    "review_context_id",
+    "artifact_sha256",
+    "spec_sha256",
+    "seal_sha256",
+    "review_path",
+    "review_sha256",
+    "spec_received_at",
+    "peer_reviews_hidden"
+  ]
+}

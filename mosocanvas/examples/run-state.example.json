@@ -6,6 +6,11 @@
   "spec_ref": "visual-spec.example.json",
   "shot_plan_ref": "shot-plan.example.json",
   "series_plan_ref": "series-plan.example.json",
+  "review_route": {
+    "status": "pending-user-choice",
+    "prompted_at": "2026-07-28T00:30:00Z",
+    "time_disclosure_shown": true
+  },
   "approved_checkpoint": {
     "source_ref": "codex://artifact/example-pilot",
     "role": "approved-pilot",

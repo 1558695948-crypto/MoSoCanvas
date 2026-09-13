@@ -42,6 +42,11 @@ compiling an edit into one or more parent-bound Feedback Deltas.
 When structured selection is unavailable, retain a fallback description and record the limitation.
 Never derive a mask from the mere fact that the user commented in Canvas.
 
+`pixel-bounded-edit` describes a located operation, not a verified result. Coordinates and masks
+cannot prove that the returned image preserved anything. For an exact preservation claim, composite
+the candidate through a reviewed coverage mask and attach a freshly recomputed RGBA/ICC report as
+described in [preservation-and-repair.md](preservation-and-repair.md).
+
 ## Return to Canvas
 
 After execution, inspect the actual artifact, bind it as a child attempt, and present it with the

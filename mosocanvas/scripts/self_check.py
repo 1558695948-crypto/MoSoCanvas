@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 from pathlib import Path
 import py_compile
@@ -27,6 +28,7 @@ EXAMPLE_SCHEMAS = {
     "series-plan.example.json": "series-plan.schema.json",
     "shot-plan.example.json": "shot-plan.schema.json",
     "visual-spec.example.json": "visual-spec.schema.json",
+    "editorial-depth-spec.example.json": "visual-spec.schema.json",
 }
 
 
@@ -171,6 +173,24 @@ def main() -> int:
     for path in sorted(ROOT.rglob("*.json")):
         load_json(path, blockers)
 
+    entrypoints = 0
+    for path in sorted((ROOT / "scripts").glob("*.py")):
+        if path.name == "self_check.py":
+            continue
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except SyntaxError:
+            continue  # Already recorded by the compile check.
+        if not any(isinstance(node, ast.Import) and any(a.name == "argparse" for a in node.names) for node in tree.body):
+            continue
+        entrypoints += 1
+        try:
+            result = subprocess.run([sys.executable, str(path), "--help"], capture_output=True, text=True, timeout=20)
+            if result.returncode:
+                blockers.append(f"CLI import/help failed for {path.name}: {result.stderr.strip()}")
+        except (OSError, subprocess.TimeoutExpired) as exc:
+            blockers.append(f"CLI startup failed for {path.name}: {exc}")
+
     tests = subprocess.run(
         [sys.executable, str(ROOT / "scripts" / "run_tests.py")],
         text=True,
@@ -181,6 +201,20 @@ def main() -> int:
         blockers.append("deterministic test suite failed")
 
     schema_count, example_count = validate_schemas(blockers, warnings, args.strict)
+    direction_count = 0
+    try:
+        from compile_generation_brief import load_direction
+        for path in sorted((ROOT / "directions").glob("*.json")):
+            pack = load_json(path, blockers)
+            if not isinstance(pack, dict):
+                continue
+            if pack.get("id") != path.stem:
+                blockers.append(f"direction pack ID must match filename: {path.name}")
+            for variant in pack.get("variants", []):
+                load_direction({"id": path.stem, "variant": variant.get("id")})
+                direction_count += 1
+    except (ImportError, OSError, ValueError) as exc:
+        blockers.append(f"direction catalog validation failed: {exc}")
     eval_count = validate_evals(blockers)
     link_count = validate_markdown_links(blockers)
 
@@ -191,6 +225,8 @@ def main() -> int:
         "root": str(ROOT),
         "checks": {
             "python_files_compiled": compiled,
+            "cli_entrypoints_executed": entrypoints,
+            "direction_variants_validated": direction_count,
             "deterministic_tests_passed": tests.returncode == 0,
             "json_schemas_found": schema_count,
             "schema_examples_validated": example_count,

@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+"""Local MoSoCanvas command-line entry point."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SCRIPTS_ROOT = PROJECT_ROOT / "mosocanvas" / "scripts"
+sys.path.insert(0, str(SCRIPTS_ROOT))
+
+
+def main() -> int:
+    if len(sys.argv) < 2:
+        print(
+            "Usage: mosocanvas "
+            "{compile|direction-board|wallpaper-pack|edit-state|prepare-edit|stage-edit|commit-edit} "
+            "[OPTIONS]",
+            file=sys.stderr,
+        )
+        return 64
+    command = sys.argv[1]
+    if command == "compile":
+        from compile_generation_brief import main as compile_main
+        return compile_main(sys.argv[2:])
+    if command == "direction-board":
+        from build_direction_board import main as board_main
+        return board_main(sys.argv[2:])
+    if command == "wallpaper-pack":
+        from wallpaper_pack import main as wallpaper_pack_main
+
+        return wallpaper_pack_main(sys.argv[2:])
+    if command == "edit-state":
+        from edit_state import main as edit_state_main
+
+        return edit_state_main(sys.argv[2:])
+    if command == "prepare-edit":
+        from prepare_edit import main as prepare_edit_main
+
+        return prepare_edit_main(sys.argv[2:])
+    if command == "stage-edit":
+        from stage_edit import main as stage_edit_main
+
+        return stage_edit_main(sys.argv[2:])
+    if command == "commit-edit":
+        from commit_edit import main as commit_edit_main
+
+        return commit_edit_main(sys.argv[2:])
+    print(f"Unknown command: {command}", file=sys.stderr)
+    return 64
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

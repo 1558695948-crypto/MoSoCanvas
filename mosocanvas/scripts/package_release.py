@@ -35,7 +35,7 @@ def included_files() -> list[Path]:
 def main() -> int:
     parser = argparse.ArgumentParser(description="Package the current MoSoCanvas release.")
     parser.add_argument("output_dir", type=Path)
-    parser.add_argument("--source-label", default=".agents/skills/mosocanvas")
+    parser.add_argument("--source-label", default="mosocanvas")
     args = parser.parse_args()
 
     version = (ROOT / "VERSION.txt").read_text(encoding="utf-8").strip()

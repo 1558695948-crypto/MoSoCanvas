@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate MoSoCanvas v1.3 execution contracts without claiming visual quality."""
+"""Validate MoSoCanvas execution contracts without claiming visual quality."""
 
 from __future__ import annotations
 
@@ -8,6 +8,8 @@ import hashlib
 import json
 from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft202012Validator, FormatChecker
 
 from evidence import EvidenceError, load_object, load_registry, require_evidence
 from attempt_review_validate import validate as validate_attempt_review
@@ -22,6 +24,7 @@ PHASES_AFTER_EXECUTION = {"independent-review", "decision", "accept"}
 GENERATIVE_OPERATIONS = {
     "masked-generative", "full-frame-generative", "full-regeneration"
 }
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def file_sha256(path: Path) -> str:
@@ -57,6 +60,137 @@ def flag_missing_keys(
     for key in keys:
         if key not in value:
             blockers.append(f"{label} missing required field: {key}")
+
+
+def validate_json_schema(
+    value: dict[str, Any], schema_name: str, label: str, blockers: list[str]
+) -> bool:
+    schema = load_json(ROOT / "schemas" / schema_name, schema_name, blockers)
+    if not schema:
+        return False
+    errors = sorted(
+        Draft202012Validator(schema, format_checker=FormatChecker()).iter_errors(value),
+        key=lambda error: str(list(error.path)),
+    )
+    for error in errors:
+        location = ".".join(map(str, error.path)) or "<root>"
+        blockers.append(f"{label} schema at {location}: {error.message}")
+    return not errors
+
+
+def same_reference(first: str, second: str, base: Path) -> bool:
+    if first == second:
+        return True
+    first_path = resolve_local(first, base)
+    second_path = resolve_local(second, base)
+    return bool(first_path and second_path and first_path.resolve() == second_path.resolve())
+
+
+def validate_edit_plan_attempt(
+    state: dict[str, Any],
+    attempt: dict[str, Any],
+    label: str,
+    base: Path,
+    blockers: list[str],
+) -> None:
+    plan_ref = attempt.get("edit_plan_ref")
+    if not plan_ref:
+        blockers.append(f"{label} masked-generative execution requires edit_plan_ref")
+        return
+    plan_path = resolve_local(str(plan_ref), base)
+    if plan_path is None or not plan_path.is_file():
+        blockers.append(f"{label} edit plan is not a local file: {plan_ref}")
+        return
+    plan = load_json(plan_path, f"{label} edit plan", blockers)
+    if not validate_json_schema(plan, "edit-plan.schema.json", f"{label} edit plan", blockers):
+        return
+    if plan.get("id") != attempt.get("attempt_id"):
+        blockers.append(f"{label} edit plan id does not match attempt_id")
+    checkpoint = state.get("approved_checkpoint") or {}
+    checkpoint_hash = checkpoint.get("sha256")
+    checkpoint_path = resolve_local(str(checkpoint.get("source_ref", "")), base)
+    if checkpoint_hash and plan["base"]["sha256"].lower() != str(checkpoint_hash).lower():
+        blockers.append(f"{label} edit plan base hash does not match approved checkpoint")
+    elif checkpoint_path and checkpoint_path.is_file() and file_sha256(checkpoint_path) != plan["base"]["sha256"]:
+        blockers.append(f"{label} edit plan base bytes do not match approved checkpoint")
+    for ref_key, hash_key, name in (
+        ("prepared_input_ref", "prepared_input_sha256", "prepared input"),
+        ("write_mask_ref", "write_mask_sha256", "write mask"),
+    ):
+        path = resolve_local(str(plan["region"][ref_key]), plan_path.parent)
+        if path is None or not path.is_file():
+            blockers.append(f"{label} {name} is missing")
+        elif file_sha256(path) != plan["region"][hash_key]:
+            blockers.append(f"{label} {name} changed after planning")
+    conditioning = plan["conditioning"]
+    conditioning_path = resolve_local(str(conditioning["render_ref"]), plan_path.parent)
+    if conditioning_path is None or not conditioning_path.is_file():
+        blockers.append(f"{label} conditioning render is missing")
+    elif file_sha256(conditioning_path) != conditioning["render_sha256"]:
+        blockers.append(f"{label} conditioning render changed after planning")
+    if conditioning["included_operation_ids"] != plan["depends_on"]:
+        blockers.append(f"{label} conditioning operations do not match depends_on")
+
+    document_ref = state.get("edit_document_ref")
+    if not document_ref:
+        blockers.append(f"{label} masked-generative execution requires edit_document_ref")
+    else:
+        document_path = resolve_local(str(document_ref), base)
+        if document_path is None or not document_path.is_file():
+            blockers.append(f"{label} edit document is not a local file")
+        else:
+            document = load_json(document_path, f"{label} edit document", blockers)
+            if validate_json_schema(document, "edit-state.schema.json", f"{label} edit document", blockers):
+                try:
+                    from edit_state import verify_document as verify_edit_document
+
+                    verify_edit_document(document, document_path)
+                except (ImportError, OSError, ValueError) as exc:
+                    blockers.append(f"{label} edit document integrity failed: {exc}")
+                if document.get("document_id") != plan.get("document_id"):
+                    blockers.append(f"{label} edit plan belongs to a different edit document")
+                if document.get("selected_anchor_asset_ref") != conditioning.get("anchor_asset_ref"):
+                    blockers.append(f"{label} conditioning anchor is not the selected clean anchor")
+                assets = {
+                    item.get("id"): item for item in document.get("assets", [])
+                    if isinstance(item, dict)
+                }
+                current = assets.get(document.get("current_render_asset_ref")) or {}
+                status = attempt.get("status")
+                if status in {"planned", "generated"}:
+                    if document.get("revision") != plan.get("expected_revision"):
+                        blockers.append(f"{label} edit plan is stale for the current document revision")
+                    if current.get("sha256") != plan["base"]["sha256"]:
+                        blockers.append(f"{label} edit plan base is not the current committed render")
+                elif status == "reviewed" and document.get("revision", 0) < plan.get("expected_revision", 0) + 1:
+                    blockers.append(f"{label} reviewed edit was not committed to the edit document")
+
+    if attempt.get("status") == "reviewed":
+        receipt_ref = attempt.get("edit_receipt_ref")
+        if not receipt_ref:
+            blockers.append(f"{label} reviewed masked edit requires edit_receipt_ref")
+            return
+        receipt_path = resolve_local(str(receipt_ref), base)
+        if receipt_path is None or not receipt_path.is_file():
+            blockers.append(f"{label} edit receipt is not a local file")
+            return
+        receipt = load_json(receipt_path, f"{label} edit receipt", blockers)
+        if not validate_json_schema(receipt, "edit-receipt.schema.json", f"{label} edit receipt", blockers):
+            return
+        if receipt.get("operation_id") != attempt.get("attempt_id"):
+            blockers.append(f"{label} receipt operation_id does not match attempt_id")
+        if (receipt.get("plan") or {}).get("sha256") != file_sha256(plan_path):
+            blockers.append(f"{label} receipt does not bind to the attached edit plan")
+        review_ref = attempt.get("attempt_review_ref")
+        review_path = resolve_local(str(review_ref or ""), base)
+        if (
+            review_path is None
+            or not review_path.is_file()
+            or (receipt.get("attempt_review") or {}).get("sha256") != file_sha256(review_path)
+        ):
+            blockers.append(f"{label} receipt does not bind to the attached attempt review")
+        if receipt.get("preservation_status") != "pass":
+            blockers.append(f"{label} edit receipt lacks a passing preservation check")
 
 
 def finish(
@@ -168,6 +302,11 @@ def validate_release_evidence(
         except EvidenceError as exc:
             blockers.append(str(exc))
 
+    checkpoint_path = resolved.get(str(checkpoint.get("source_ref", "")))
+    if checkpoint_path and checkpoint.get("sha256"):
+        if file_sha256(checkpoint_path).lower() != checkpoint["sha256"].lower():
+            blockers.append("checkpoint sha256 does not match registered source")
+
     for review_id in attempt_review_ids:
         if review_id not in resolved:
             continue
@@ -244,7 +383,7 @@ def validate_release_evidence(
             spec_document = load_object(resolved[str(spec_id)], "visual spec")
             if spec_document.get("schema") not in {
                 "moso.visual-spec/0.1", "moso.visual-spec/0.2",
-                "moso.visual-spec/0.3", "moso.visual-spec/0.4"
+                "moso.visual-spec/0.3", "moso.visual-spec/0.4", "moso.visual-spec/0.5"
             }:
                 blockers.append("registered visual spec has the wrong schema")
         except EvidenceError as exc:
@@ -340,6 +479,60 @@ def validate_release_evidence(
         blockers.append("user decision actor must be user")
 
 
+def validate_preservation_checks(
+    state: dict[str, Any], base: Path, blockers: list[str], registry_path: Path | None = None
+) -> None:
+    """Recompute each explicit per-candidate pixel claim; never trust a stored pass flag."""
+    checks = state.get("preservation_checks") or []
+    claimed_reports = {
+        item.get("evidence_ref") for item in state.get("verification", [])
+        if item.get("method") == "decoded-rgba-and-icc" and item.get("status") == "pass"
+    }
+    if not checks and not claimed_reports:
+        return
+    try:
+        from verify_mask_preservation import verify
+        indexed = load_registry(registry_path)[1] if registry_path else None
+
+        def resolve(ref: str, kinds: set[str]) -> Path:
+            if indexed is not None:
+                return require_evidence(ref, indexed, registry_path, kinds)[1]
+            path = resolve_local(ref, base)
+            if path is None or not path.is_file():
+                raise ValueError(f"preservation input is not a local file: {ref}")
+            return path.resolve()
+
+        checked_reports: set[str] = set()
+        checkpoint = state.get("approved_checkpoint") or {}
+        for check in checks:
+            paths = {name: resolve(check[name + "_ref"], {"artifact", "composition-proof"} if name == "source" else
+                                   {"artifact"} if name == "candidate" else {"other"})
+                     for name in ("source", "candidate", "mask", "report")}
+            if checkpoint.get("role") not in {None, "none", "reference"}:
+                expected = resolve(checkpoint.get("source_ref", ""), {"artifact", "composition-proof"})
+                if paths["source"] != expected or (checkpoint.get("sha256") and file_sha256(expected).lower() != checkpoint["sha256"].lower()):
+                    raise ValueError("preservation source does not match the approved checkpoint")
+            origin = check["mask_origin"]
+            if len(origin) != 2 or any(type(v) is not int or v < 0 for v in origin):
+                raise ValueError("preservation mask_origin must contain two nonnegative integers")
+            fresh = verify(paths["source"], paths["candidate"], paths["mask"], tuple(origin))
+            stored = load_object(paths["report"], "preservation report")
+            # Paths can change when a evidence package moves; hash-bound content and measurements cannot.
+            for name in ("source", "candidate", "mask"):
+                if (stored.get("inputs", {}).get(name) or {}).get("sha256") != fresh["inputs"][name]["sha256"]:
+                    raise ValueError(f"preservation report has a stale {name} hash")
+            for key, value in fresh.items():
+                if key != "inputs" and stored.get(key) != value:
+                    raise ValueError(f"preservation report does not match recomputed {key}")
+            if fresh["status"] != "pass":
+                raise ValueError("protected RGBA samples or ICC failed preservation verification")
+            checked_reports.add(check["report_ref"])
+        if claimed_reports - checked_reports:
+            raise ValueError("pixel preservation pass requires a matching, recomputed preservation_checks report")
+    except (ImportError, EvidenceError, OSError, ValueError, KeyError, TypeError) as exc:
+        blockers.append(f"preservation: {exc}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Check structural readiness; this does not inspect or approve image aesthetics."
@@ -370,6 +563,23 @@ def main() -> int:
             blockers.append("legacy phase accept lacks an independent release review")
         return finish(args, blockers, warnings)
 
+    schema_valid = validate_json_schema(
+        state, "run-state.schema.json", "run state", blockers
+    )
+    if not schema_valid and (
+        not isinstance(state.get("approved_checkpoint", {}), dict)
+        or not isinstance(state.get("attempt_budget", {}), dict)
+        or not isinstance(state.get("quality_status", {}), dict)
+        or not isinstance(state.get("output_requirements", {}), dict)
+        or not isinstance(state.get("generation_attempts", []), list)
+        or any(
+            not isinstance(item, dict)
+            for item in state.get("generation_attempts", [])
+        )
+        or not isinstance(state.get("verification", []), list)
+    ):
+        return finish(args, blockers, warnings)
+
     flag_missing_keys(
         state,
         (
@@ -388,6 +598,9 @@ def main() -> int:
     budget = state.get("attempt_budget") or {}
     quality = state.get("quality_status") or {}
     output = state.get("output_requirements") or {}
+    release_registry_mode = phase == "accept" and bool(
+        args.registry or state.get("evidence_registry_ref")
+    )
 
     if mode in {"production", "repair"}:
         if checkpoint.get("role") in {None, "none", "reference"}:
@@ -401,9 +614,13 @@ def main() -> int:
         lineage = state.get("lineage") or {}
         if not lineage.get("parent_ref") or not lineage.get("operation"):
             blockers.append("repair requires lineage.parent_ref and lineage.operation")
+        elif not same_reference(
+            str(lineage["parent_ref"]), str(checkpoint.get("source_ref", "")), base
+        ):
+            blockers.append("repair lineage.parent_ref must match the approved checkpoint source")
 
     source_ref = checkpoint.get("source_ref", "")
-    local_checkpoint = resolve_local(source_ref, base)
+    local_checkpoint = None if release_registry_mode else resolve_local(source_ref, base)
     if local_checkpoint:
         if not local_checkpoint.exists():
             blockers.append(f"checkpoint source does not exist: {local_checkpoint}")
@@ -427,9 +644,6 @@ def main() -> int:
         elif used > allowed:
             blockers.append(f"{kind} attempt budget exceeded: {used}>{allowed}")
 
-    release_registry_mode = phase == "accept" and bool(
-        args.registry or state.get("evidence_registry_ref")
-    )
     shot_plan_path = args.shot_plan
     if (
         not shot_plan_path
@@ -482,6 +696,18 @@ def main() -> int:
     )
     if is_generative and not attempts:
         blockers.append("generative execution requires generation_attempts")
+    attempt_ids = [attempt.get("attempt_id") for attempt in attempts]
+    if len(set(attempt_ids)) != len(attempt_ids):
+        blockers.append("generation attempt IDs must be unique")
+    prior_attempt_ids: set[str] = set()
+    for index, attempt in enumerate(attempts, start=1):
+        parent_id = attempt.get("parent_attempt_id")
+        if parent_id and parent_id not in prior_attempt_ids:
+            blockers.append(
+                f"generation attempt {index} parent_attempt_id must refer to an earlier attempt"
+            )
+        if attempt.get("attempt_id"):
+            prior_attempt_ids.add(str(attempt["attempt_id"]))
 
     def validate_feedback_refs(refs: list[str], label: str) -> None:
         for ref in refs:
@@ -562,6 +788,11 @@ def main() -> int:
             blockers.append(f"{prefix} brief must be communicated before generation")
 
         status = attempt.get("status")
+        if (
+            phase in {"execute", "independent-review", "decision", "accept"}
+            and lineage.get("operation") == "masked-generative"
+        ):
+            validate_edit_plan_attempt(state, attempt, prefix, base, blockers)
         execution = attempt.get("execution") or {}
         if status in {"generated", "reviewed", "rejected"}:
             flag_missing_keys(
@@ -573,6 +804,8 @@ def main() -> int:
                 f"{prefix} execution",
                 blockers,
             )
+            if (execution.get("model") is None or execution.get("model_version") is None) and not execution.get("observation_limits"):
+                blockers.append(f"{prefix} unknown model metadata requires observation_limits")
         if phase in PHASES_AFTER_EXECUTION and status in {"planned", "generated"}:
             blockers.append(f"{prefix} must complete immediate review after execution")
         if status in {"reviewed", "rejected"}:
@@ -624,6 +857,13 @@ def main() -> int:
 
     if attempts and attempts[-1].get("status") == "planned":
         response = attempts[-1].get("trajectory_response")
+        if response == "continue" and (
+            quality.get("protected_drift") == "exceeded"
+            or quality.get("trajectory") == "worsening"
+        ):
+            blockers.append(
+                "worsening trajectory or exceeded protected drift forbids continuing the same method"
+            )
         non_improving = {"missed", "unobservable"}
         if len(observed_target_statuses) >= 2 and all(
             status in non_improving for status in observed_target_statuses[-2:]
@@ -665,6 +905,14 @@ def main() -> int:
             blockers.append("phase accept requires a local evidence registry")
         else:
             validate_release_evidence(state, registry_path, blockers)
+
+    preservation_registry = args.registry
+    if not preservation_registry and phase == "accept" and state.get("evidence_registry_ref"):
+        preservation_registry = resolve_local(str(state["evidence_registry_ref"]), base)
+    if phase == "accept" and state.get("preservation_checks") and not preservation_registry:
+        blockers.append("accepted preservation checks require an evidence registry")
+    else:
+        validate_preservation_checks(state, base, blockers, preservation_registry if phase == "accept" else None)
 
     return finish(args, blockers, warnings)
 

@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mosocanvas.local/schemas/visual-spec-0.4.json",
-  "title": "MoSoCanvas Visual Spec 0.4",
+  "$id": "https://mosocanvas.local/schemas/visual-spec-0.5.json",
+  "title": "MoSoCanvas Visual Spec 0.5 (0.4 compatible)",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "id", "version", "task", "proposition", "viewer_contract", "hierarchy", "constraints", "strategy", "evaluation"],
   "properties": {
-    "schema": { "const": "moso.visual-spec/0.4" },
+    "schema": { "enum": ["moso.visual-spec/0.4", "moso.visual-spec/0.5"] },
     "id": { "type": "string", "minLength": 1 },
     "version": { "type": "integer", "minimum": 1 },
     "parent_version": { "type": "integer", "minimum": 1 },
@@ -141,6 +141,178 @@
         "change_reason": { "type": "string", "minLength": 1 }
       }
     },
+    "generation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "type": "string",
+          "minLength": 1
+        },
+        "medium": {
+          "type": "string",
+          "minLength": 1
+        },
+        "composition": {
+          "type": "string",
+          "minLength": 1
+        },
+        "color_light": {
+          "type": "string",
+          "minLength": 1
+        },
+        "direction": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "variant": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "id",
+            "variant"
+          ]
+        },
+        "text": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "text": {
+                "type": "string",
+                "minLength": 1
+              },
+              "placement": {
+                "type": "string",
+                "minLength": 1
+              },
+              "method": {
+                "enum": [
+                  "generated",
+                  "overlay"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "text",
+              "placement",
+              "method"
+            ]
+          }
+        },
+        "references": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "path": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "enum": [
+                  "subject",
+                  "identity",
+                  "layout",
+                  "style",
+                  "material",
+                  "background",
+                  "edit-parent"
+                ]
+              },
+              "use": {
+                "type": "string",
+                "minLength": 1
+              },
+              "exclude": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              }
+            },
+            "required": [
+              "id",
+              "path",
+              "role",
+              "use",
+              "exclude"
+            ]
+          }
+        },
+        "requested_parameters": {
+          "type": "object"
+        },
+        "target_size": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "width": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "height": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          "required": [
+            "width",
+            "height"
+          ]
+        },
+        "parent": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "checkpoint_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "spec_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "spec_version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          },
+          "required": [
+            "checkpoint_ref",
+            "spec_ref",
+            "spec_version",
+            "sha256"
+          ]
+        }
+      },
+      "required": [
+        "subject"
+      ]
+    },
     "physical_output": {
       "type": "object",
       "additionalProperties": false,
@@ -166,6 +338,20 @@
     {
       "if": { "properties": { "task": { "properties": { "domain": { "const": "physical-promotional-collateral" } } } } },
       "then": { "required": ["physical_output"] }
+    },
+    {
+      "if": {
+        "properties": {
+          "schema": {
+            "const": "moso.visual-spec/0.5"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "generation"
+        ]
+      }
     }
   ],
   "$defs": {

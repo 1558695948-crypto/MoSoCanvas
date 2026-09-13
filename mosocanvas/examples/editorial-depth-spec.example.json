@@ -1,0 +1,55 @@
+{
+  "schema": "moso.visual-spec/0.5",
+  "id": "editorial-departure",
+  "version": 1,
+  "task": {
+    "domain": "poster",
+    "purpose": "通过离席留下的物理痕迹，呈现一场尚未结束的对话。",
+    "audience": "观看叙事摄影的读者",
+    "output_context": "单张竖版编辑海报；标题后期排版。"
+  },
+  "proposition": {
+    "primary_message": "人离开后，桌上的关系仍在继续。",
+    "desired_response": "先注意到离席，再发现另一人仍在等待。",
+    "residual_question": "这次离开是短暂的，还是最后一次？"
+  },
+  "viewer_contract": {
+    "position": "witness",
+    "information_power": "观众晚到一步，只能从接触痕迹推断事件。",
+    "first_read": "被拉开的椅子和桌缘倾倒的水杯。",
+    "second_read": "对面仍摆着一杯未动的水，杯底有连续的接触阴影。",
+    "withheld": "人物身份和离席原因不出现在画面中。"
+  },
+  "hierarchy": {
+    "first": "离席一侧的空椅与倾倒水杯",
+    "second": "对面完整水杯所占据的等待位置"
+  },
+  "constraints": {
+    "must_include": ["一张普通木桌、两把椅子、两只透明水杯", "倒杯旁的水迹与杯口连续相接"],
+    "must_avoid": ["人物、额外杯子、漂浮水滴", "不连续的桌缘与穿插的椅腿", "未经指定的标志与画内文字"],
+    "preserve": ["倾倒的一侧控制第一读，对面水杯仅在第二眼被发现", "顶部留出低细节标题空间"]
+  },
+  "strategy": {
+    "selected_direction": "由接触关系与位置差异叙事的静物摄影。",
+    "structural_mechanisms": ["空椅偏移指示离开方向", "两只杯子的状态差异提示未完成的对话"],
+    "familiar_rule": "水迹、杯底阴影与桌面服从同一个重力和光源。",
+    "designed_anomaly": "无超自然异常；叙事张力来自位置和状态差异。",
+    "trend_use": "not-used"
+  },
+  "generation": {
+    "subject": "午后室内一张木桌两侧的空椅；近侧椅子刚被拉开，一只水杯向桌内倾倒，另一只水杯仍直立在对面。",
+    "direction": {"id": "editorial-depth", "variant": "aftermath"},
+    "composition": "竖幅，中近景，从桌缘略高处斜看；近侧空椅从右下裁入，倒杯位于中下部，对面立杯靠左上；顶部四分之一是低细节暗墙。",
+    "color_light": "自然木色、透明玻璃和偏冷灰墙；右侧窗光形成一致的柔边阴影，倒杯处的明暗对比高于对面立杯。",
+    "text": [{"id": "title", "text": "离席之后", "placement": "顶部低细节暗墙区域", "method": "overlay"}],
+    "references": [],
+    "target_size": {"width": 1200, "height": 1600}
+  },
+  "evaluation": {
+    "observable_pass_conditions": ["缩至180像素宽时先读到离席关系", "正常尺寸能发现对面立杯", "水迹连续连接倒杯，椅腿与桌缘没有穿插"],
+    "known_failure_signs": ["两个杯子争夺同等注意力", "水迹变成装饰图案", "顶部文字空间被高对比细节占用"],
+    "user_judgment_required": ["等待与不安的程度是否符合预期"]
+  },
+  "uncertainty": {"assumptions": ["这是演示用的虚构编辑海报，不对应外部品牌活动。"], "unresolved": []},
+  "provenance": {"created_at": "2026-09-10T00:00:00+08:00", "source_refs": ["MoSoCanvas visual-narrative and shot-composition grammar"], "change_reason": "原创单图编译示例；没有执行生图或用户验收。"}
+}

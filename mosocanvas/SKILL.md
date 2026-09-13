@@ -3,7 +3,7 @@ name: mosocanvas
 description: Evidence-based visual direction for zero-reference or reference-led campaign images, posters, social image series, and physical promotional collateral. Use when Codex must turn an intent into authored shots, composition boards, visual narrative, color/light scripts, trend-informed mechanisms, independent artifact reviews, controlled repairs, or blind quality benchmarking against leading image generators such as Midjourney. Do not use for mechanical conversion, UI/product-flow design, pure retouching without art-direction decisions, or visual claims about an artifact that cannot be inspected.
 ---
 
-# MoSoCanvas v1.3.0
+# MoSoCanvas v1.6.0
 
 Act as a visual director, not a prompt decorator. Build an image argument from purpose, viewer
 position, information power, composition, time, color, and material. Keep execution model-neutral.
@@ -23,6 +23,8 @@ Treat Midjourney as a moving external quality target, never as a required backen
 - Bind Codex Image Canvas comments to explicit artifacts before treating “this one” or “this area”
   as an executable instruction.
 - Treat pixel and edge deltas as stall evidence, never as proof that the intended semantic change worked.
+- Never feed a raw generated repair back as the next parent. Stage, inspect, and commit a verified
+  composite; prepare later model input from the clean anchor plus only explicit accepted dependencies.
 
 ## Select one mode
 
@@ -34,6 +36,16 @@ Treat Midjourney as a moving external quality target, never as a required backen
 
 Choose the lightest sufficient mode.
 
+| Task | Applicable route |
+|---|---|
+| One image with explicit subject, layout and use | Freeze those choices in a compact Spec; compile, execute and inspect. The Spec and compiled request are the preparation record; do not create a production run state just for this step. |
+| Unresolved campaign hero or image series | Use the full direction and composition-proof gates below. |
+| Accepted image with a local correction | Reuse the approved parent and direction; apply a Feedback Delta and preservation checks. |
+| Exact crop, signature, text overlay or export | Use deterministic tools; a new art-direction process is unnecessary. |
+
+The route changes preparation effort, not preservation, inspection or acceptance requirements.
+Ask only about choices that would materially affect the result; existing authorization remains valid.
+
 ## Run the gates
 
 Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 composition proof`
@@ -42,7 +54,7 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 ### G0 Route
 
-- Confirm domain, mode, carrier, quantity, dimensions, assets, rights, and usable tools.
+- Establish domain, mode, carrier, quantity, dimensions, assets, and usable tools.
 - Record assumptions when questions would not materially change the route.
 
 ### G1 Proposition
@@ -53,7 +65,7 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 ### G2 Native directions
 
-- For zero-reference work, ideate three to five structurally distinct directions before consulting
+- When direction is unresolved, ideate three to five structurally distinct directions before consulting
   trend signals. Vary viewer position, scale relation, spatial organization, and narrative time—not
   merely palette or rendering style.
 - Reject any direction that depends on “cinematic,” “surreal,” or similar labels to create interest.
@@ -61,10 +73,13 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
   [visual-narrative.md](references/visual-narrative.md).
 - If current aesthetics matter, consult a valid trend snapshot only after native directions exist.
   Load [aesthetic-radar.md](references/aesthetic-radar.md).
+- A direction pack is optional. Load [direction-packs.md](references/direction-packs.md) only when
+  its viewer relation serves the brief. User choices override defaults; do not introduce a pack in a repair.
 
 ### G3 Composition proof
 
-- Create a shot plan before full-resolution generation.
+- Create a shot plan for a hero image or series before full-resolution generation. For a simple
+  single image with explicit layout, capture that layout directly in the Spec's generation block.
 - Prove each candidate as a monochrome value thumbnail or explicit mass map: subject envelope,
   negative space, horizon/plane, eye-line or gaze vector, dominant diagonals, crop pressure, and
   carrier safe zones.
@@ -74,13 +89,20 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 ### G4 Freeze
 
-- Freeze a Visual Spec plus a shot plan. For a series, also freeze a series plan and color script.
+- Freeze a Visual Spec plus any shot plan required by G3. For a series, also freeze a series plan and color script.
 - Keep structural invariants separate from shot-level variation. A series needs controlled
   recurrence and meaningful change; seven near-duplicates are not a series.
 - Use [schemas/visual-spec.schema.json](schemas/visual-spec.schema.json),
   [schemas/shot-plan.schema.json](schemas/shot-plan.schema.json), and when relevant
   [schemas/series-plan.schema.json](schemas/series-plan.schema.json).
-- For production and repair, create [schemas/run-state.schema.json](schemas/run-state.schema.json).
+- For repair, hero/series production, or acceptance/release, create
+  [schemas/run-state.schema.json](schemas/run-state.schema.json). A simple single-image preparation
+  uses its Spec and compiled request without a run state; a textual brief is not an approved image
+  checkpoint. Before acceptance, promote the reviewed image/layout to a real checkpoint and register
+  its evidence. Do not invent an approval, proof, or shot-plan file to satisfy a validator.
+- For a bounded generative repair, initialize a persistent edit document from the approved clean
+  checkpoint with [edit_state.py](scripts/edit_state.py). Keep its original/anchor assets, operation
+  graph, revisions, raw candidates, masks, patches, reviews, and commit receipts.
 - Register every release-relevant file in
   [schemas/evidence-registry.schema.json](schemas/evidence-registry.schema.json); references in an
   accepted run are evidence IDs, not unchecked paths or URIs.
@@ -89,8 +111,13 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 - State a concise `生成前设计说明`: objective, viewer position, first read, composition geometry,
   narrative beat, color/light logic, required and protected content, and the main failure risk.
-- Record the attempt's backend, exact model/version, prompt or prompt hash, parameters, reference
-  roles and weights, seed when used, timestamp, and output reference.
+- Record the observable backend/model/version, prompt hash, applied parameters, reference roles,
+  timestamp and output. Unexposed model fields are `null` with `observation_limits`; do not guess.
+  Keep requested, returned and exported dimensions separate. Record weights or seed only if applied.
+- For a single-frame Visual Spec 0.5, use
+  [compile_generation_brief.py](scripts/compile_generation_brief.py), following
+  [generation-compiler.md](references/generation-compiler.md). Review its prompt, overlay plan,
+  reference hashes and unapplied parameters before invoking the image tool. Compilation does not generate.
 - When the attempt responds to user feedback, create and validate
   [schemas/feedback-delta.schema.json](schemas/feedback-delta.schema.json). Separate `change`,
   `preserve`, `prohibit`, element relationships, promoted accidents, and observable verification.
@@ -98,8 +125,13 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
   intent, and honest region locator with
   [schemas/native-canvas-feedback.schema.json](schemas/native-canvas-feedback.schema.json). Give
   every edit parent its own Feedback Delta. A host comment is not proof of a mask.
-- Run [preflight_validate.py](scripts/preflight_validate.py). This checks contract integrity only; it
-  is not an aesthetic review.
+- Before a `masked-generative` attempt reaches `execute`, create a hash-bound ROI plan with
+  [prepare_edit.py](scripts/prepare_edit.py), attach `edit_document_ref` to the run and
+  `edit_plan_ref` to the attempt, and compile with `--edit-plan`. The plan must contain a protected
+  region; a full-canvas write mask is not a bounded edit.
+- Run [preflight_validate.py](scripts/preflight_validate.py) when a run state is required. The light
+  single-image route uses the compiler's schema, uncertainty and reference checks. Both check
+  contract integrity only; neither is an aesthetic review.
 - A pure Skill cannot intercept a host-native image tool. Treat a passing preflight as a mandatory
   procedural gate, not a claim of platform-level enforcement. Upgrade to a Plugin only when hard
   interception is required.
@@ -108,6 +140,14 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 - Prefer deterministic layout for exact text, logos, geometry, crop, and export.
 - Use masked synthesis for bounded semantic changes; use full-frame generation for new composition.
+- Submit the plan's `prepared-input.png`, not the last generated output. By default it is built from
+  the selected clean anchor. Include earlier operation IDs with `--depends-on` only when the new
+  visual change truly needs those accepted patches.
+- Treat the returned image as a raw candidate. Use [stage_edit.py](scripts/stage_edit.py) to build the
+  exact deterministic composite, inspect that staged artifact at use and detail scale, and record an
+  artifact-hash-bound attempt review. [commit_edit.py](scripts/commit_edit.py) accepts only an
+  achieved target, protected drift within tolerance, and an `accept` recommendation; it then
+  rechecks the composite and replay before advancing the edit revision.
 - Generate one pilot before expanding a series.
 - For exploration, vary one named structural variable per batch. Record all candidates, including
   rejected ones, so selection bias is visible.
@@ -124,6 +164,28 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 ### G7 Independent review
 
+- **Ask before opening a panel.** The three-agent panel is opt-in; delegation availability or a
+  previous task authorization is not consent to spend the user's time. Only when a selected pilot,
+  substantial repair candidate, or final visual review is otherwise eligible for the panel, first
+  ask one concise question and disclose the cost: `是否需要三位子智能体盲审？这会增加等待时间（每位先独立看图，再封存观察并汇总投票）。需要就启动；不需要则由你直接审图。`
+  Do not spawn, seal, or prepare panel votes before the user chooses.
+- If the user chooses **not to use the panel**, do not create a faux panel or silently downgrade the
+  review. Show the actual artifact to the user, provide the same compact rubric, and route the
+  candidate to human review. Record the choice and keep `user_acceptance` separate from the review
+  recommendation. For a release, a human artifact review and a separate user decision still need
+  evidence; declining subagents does not authorize release by itself.
+- When a run state is used, record the route explicitly as `pending-user-choice` before the answer,
+  `three-agent-panel` after an opt-in, or `human-review` after a decline, together with the time
+  disclosure and the user's decision time. Do not infer the route from whether a panel result file
+  happens to exist.
+- If the user has not answered the panel-choice question, do not start the panel. Leave the review
+  pending or hand the artifact to the user for review when the task can proceed without waiting;
+  never infer consent from silence.
+- For selected pilots, substantial repair candidates and final visual review, use the
+  [three-agent panel](references/three-agent-review.md) only when delegation is available and the
+  user has opted in.
+  Spawn three fresh contexts, seal independent first impressions before revealing the brief, then
+  collect separate reviews and votes. Do not show reviewers their peers' opinions before commitment.
 - Build a blind review packet without prompt rhetoric or the generator's self-justification.
 - Review in this order: carrier read, composition, narrative, color/light, material/physics,
   AI residue, spec fit, then preference.
@@ -134,6 +196,9 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Record findings with [schemas/artifact-review.schema.json](schemas/artifact-review.schema.json)
   and validate with [review_validate.py](scripts/review_validate.py).
 - Load [generated-image-authenticity.md](references/generated-image-authenticity.md).
+- Majority recommendations retain minority evidence. A material conflict requires verification,
+  not automatic rejection or majority override. Follow [learning-and-memory.md](references/learning-and-memory.md)
+  for task state and evidence-backed learning candidates; saved reviews are not model training.
 
 ### G8 User decision
 
@@ -155,6 +220,8 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Freeze decisions and checkpoints; do not freeze the execution method.
 - Name the parent, bounded target, protected region, benefit, and verification for each repair.
 - Branch from the best checkpoint when non-target drift grows.
+- Keep the latest committed canvas separate from model conditioning. A new edit commits onto the
+  latest canvas, while its conditioning view starts from the clean anchor plus explicit dependencies.
 - Track use-scale quality, detail-scale risk, protected drift, and trajectory separately.
 - Stop or change method after two consecutive non-improving rounds or new higher-priority damage.
 - Translate user corrections into a feedback delta before repair. Never append a correction to the
@@ -162,7 +229,8 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Promote an unexpected generated feature only after the user assigns it a role; once promoted,
   add it to preservation and verify it like any authored decision.
 
-Load [preservation-and-repair.md](references/preservation-and-repair.md) before changing an accepted
+Load [preservation-and-repair.md](references/preservation-and-repair.md) and
+[non-destructive-editing.md](references/non-destructive-editing.md) before changing an accepted
 artifact. Load [texture-integrity.md](references/texture-integrity.md) for cross-material artifacts.
 
 ## Route references and tools
@@ -181,12 +249,21 @@ artifact. Load [texture-integrity.md](references/texture-integrity.md) for cross
 Use deterministic helpers when they establish facts:
 
 - [build_asset_manifest.py](scripts/build_asset_manifest.py): hashes, dimensions, and metadata.
+- [compile_generation_brief.py](scripts/compile_generation_brief.py): single-frame Spec to native
+  request, with constraint coverage, reference hashes and a separate deterministic text plan.
+- [build_direction_board.py](scripts/build_direction_board.py): catalog-linked composition diagrams;
+  these are schematic previews, not generated-art samples or task-specific composition proofs.
 - [analyze_reference.py](scripts/analyze_reference.py): measurable palette/value/edge evidence.
 - [build_region_mask.py](scripts/build_region_mask.py), [refine_mask.py](scripts/refine_mask.py),
   [composite_region.py](scripts/composite_region.py), and
   [verify_mask_preservation.py](scripts/verify_mask_preservation.py): bounded repair.
+- [edit_state.py](scripts/edit_state.py), [prepare_edit.py](scripts/prepare_edit.py),
+  [stage_edit.py](scripts/stage_edit.py), and [commit_edit.py](scripts/commit_edit.py): persistent
+  clean-anchor edit state, ROI preparation, review staging, and hash-bound commit.
 - [build_series_contact_sheet.py](scripts/build_series_contact_sheet.py): carrier-scale series view.
 - [build_blind_review_packet.py](scripts/build_blind_review_packet.py): prompt-blind review packet.
+- [panel_review.py](scripts/panel_review.py): seal three blind observations, check independent vote
+  records and retain majority, dissent and material conflicts. This does not spawn or visually review.
 - [feedback_validate.py](scripts/feedback_validate.py): feedback constraint and verification
   coverage; it does not infer intent.
 - [native_canvas_validate.py](scripts/native_canvas_validate.py): artifact binding, per-parent Delta
@@ -204,7 +281,7 @@ Use deterministic helpers when they establish facts:
 - [evidence_validate.py](scripts/evidence_validate.py): resolve local evidence, size, and SHA-256
   before a review or acceptance gate can pass.
 - [run_tests.py](scripts/run_tests.py): run deterministic positive and adversarial integrity tests.
-- [self_check.py](scripts/self_check.py): compile scripts, run deterministic tests, validate schemas
+- [self_check.py](scripts/self_check.py): compile scripts, start CLI entrypoints, run deterministic tests, validate schemas
   and examples, check eval manifests, and resolve local documentation links. Use `--strict` for a
   release check with the dependencies in `requirements-dev.txt`.
 

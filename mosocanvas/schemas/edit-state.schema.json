@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/edit-state-0.1.json",
+  "title": "MoSoCanvas Non-destructive Edit State 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "document_id", "revision", "created_at", "updated_at", "canvas",
+    "original_asset_ref", "selected_anchor_asset_ref", "current_render_asset_ref",
+    "assets", "operations"
+  ],
+  "properties": {
+    "schema": { "const": "moso.edit-state/0.1" },
+    "document_id": { "type": "string", "minLength": 1 },
+    "revision": { "type": "integer", "minimum": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" },
+    "canvas": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["epoch", "width", "height", "mode", "orientation"],
+      "properties": {
+        "epoch": { "type": "string", "minLength": 1 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "mode": { "enum": ["RGB", "RGBA"] },
+        "orientation": { "const": "normalized" },
+        "icc_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "original_asset_ref": { "type": "string", "minLength": 1 },
+    "selected_anchor_asset_ref": { "type": "string", "minLength": 1 },
+    "current_render_asset_ref": { "type": "string", "minLength": 1 },
+    "assets": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/asset" }
+    },
+    "operations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/operation" }
+    }
+  },
+  "$defs": {
+    "asset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "kind", "content_ref", "sha256", "size_bytes", "width", "height",
+        "format", "mode"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "kind": {
+          "enum": ["original", "anchor", "prepared-input", "raw-candidate", "patch", "mask", "render"]
+        },
+        "content_ref": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "size_bytes": { "type": "integer", "minimum": 1 },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 },
+        "format": { "type": "string", "minLength": 1 },
+        "mode": { "type": "string", "minLength": 1 }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "status", "target", "depends_on", "raw_candidate_asset_ref",
+        "patch_asset_ref", "mask_asset_ref", "mask_origin_xy", "plan_ref",
+        "plan_sha256", "attempt_review_ref", "attempt_review_sha256",
+        "receipt_ref", "receipt_sha256", "preservation_report_ref",
+        "preservation_report_sha256"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "status": { "const": "committed" },
+        "target": { "type": "string", "minLength": 1 },
+        "depends_on": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "raw_candidate_asset_ref": { "type": "string", "minLength": 1 },
+        "patch_asset_ref": { "type": "string", "minLength": 1 },
+        "mask_asset_ref": { "type": "string", "minLength": 1 },
+        "mask_origin_xy": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 0 }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "plan_ref": { "type": "string", "minLength": 1 },
+        "plan_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "attempt_review_ref": { "type": "string", "minLength": 1 },
+        "attempt_review_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "receipt_ref": { "type": "string", "minLength": 1 },
+        "receipt_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "preservation_report_ref": { "type": "string", "minLength": 1 },
+        "preservation_report_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}
