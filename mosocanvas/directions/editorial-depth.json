@@ -1,0 +1,61 @@
+{
+  "schema": "moso.direction-pack/0.1",
+  "id": "editorial-depth",
+  "version": "1.0.0",
+  "title": "叙事编辑：读到画面之后",
+  "provenance": [
+    "MoSoCanvas references/visual-narrative.md",
+    "MoSoCanvas references/shot-composition-grammar.md",
+    "MoSoCanvas references/color-and-light-script.md"
+  ],
+  "use_when": [
+    "单张编辑视觉需要第一读与第二读",
+    "主体与观众的位置关系参与叙事"
+  ],
+  "avoid_when": [
+    "已经接受的画面仅需局部修复",
+    "任务要求精确复刻既有版式",
+    "信息表格或尺寸转换即可完成任务"
+  ],
+  "variants": [
+    {
+      "id": "witness",
+      "title": "旁观的边缘",
+      "medium": "具有空间深度的编辑插画；表面笔触随材质改变。",
+      "composition": "从主体行动的侧后方观察，让前景遮挡提供观看位置；主体的动作指向画外，第二处线索解释动作留下的后果。",
+      "color_light": "先让主体与背景在明度上分离；次要线索的局部对比低于动作所在区域，照明来自同一可解释的环境。",
+      "verification": [
+        "缩略图可读出主体的行动方向",
+        "正常阅读尺寸可发现与行动相关的第二线索",
+        "遮挡服务于观看位置而非掩盖主体缺陷"
+      ],
+      "preview": "occlusion"
+    },
+    {
+      "id": "address",
+      "title": "画面对观众说话",
+      "medium": "文字与具象主体共同组织的当代编辑图像。",
+      "composition": "主体朝向观众或将物体递向观众，让近处形体建立观看距离；文字占据任务指定位置，避免切断有意义的眼神或手势。",
+      "color_light": "用面向观众的表面建立主要明暗关系；色彩的强调位置跟随交流动作，其他材料维持自身的反射特征。",
+      "verification": [
+        "主体与观众的交流动作清楚",
+        "准确文案没有被形体遮挡或误写",
+        "画面没有因近大远小产生未要求的肢体变形"
+      ],
+      "preview": "address"
+    },
+    {
+      "id": "aftermath",
+      "title": "从痕迹读出事件",
+      "medium": "强调物体接触痕迹与空间关系的编辑静物图像。",
+      "composition": "事件发生后保留可观察的物体关系：接触面、位移或留下的痕迹；主体不必出现，但两个可见线索应共同支持同一事件。",
+      "color_light": "整体明度由载体决定；在接触痕迹处建立可读的材质差异，避免用无来源的发光替代痕迹本身。",
+      "verification": [
+        "线索来自同一事件而非无关道具集合",
+        "无需字幕也能推测物体之间发生过接触",
+        "细节放大时材质变化与受力或使用方式一致"
+      ],
+      "preview": "trace"
+    }
+  ]
+}

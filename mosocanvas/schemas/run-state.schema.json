@@ -14,12 +14,35 @@
     "shot_plan_ref": { "type": "string", "minLength": 1 },
     "series_plan_ref": { "type": "string", "minLength": 1 },
     "evidence_registry_ref": { "type": "string", "minLength": 1 },
+    "edit_document_ref": { "type": "string", "minLength": 1 },
     "feedback_delta_refs": { "$ref": "#/$defs/stringArray" },
     "native_canvas_feedback_refs": { "$ref": "#/$defs/stringArray" },
+    "review_route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "prompted_at", "time_disclosure_shown"],
+      "properties": {
+        "status": { "enum": ["pending-user-choice", "three-agent-panel", "human-review"] },
+        "prompted_at": { "type": "string", "format": "date-time" },
+        "decided_at": { "type": "string", "format": "date-time" },
+        "time_disclosure_shown": { "const": true },
+        "actor": { "const": "user" },
+        "choice_note": { "type": "string", "minLength": 1 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "enum": ["three-agent-panel", "human-review"] } },
+            "required": ["status"]
+          },
+          "then": { "required": ["decided_at", "actor"] }
+        }
+      ]
+    },
     "approved_checkpoint": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_ref", "role"],
+      "required": ["role"],
       "properties": {
         "source_ref": { "type": "string", "minLength": 1 },
         "role": { "enum": ["reference", "composition-proof", "approved-pilot", "approved-mockup", "production-master", "approved-output", "none"] },
@@ -105,9 +128,56 @@
         "use_scale": { "enum": ["pending", "pass", "risk", "fail", "unobservable"] },
         "detail_scale": { "enum": ["pending", "pass", "risk", "fail", "not-required", "unobservable"] },
         "protected_drift": { "enum": ["pending", "none", "within-tolerance", "exceeded", "unobservable"] },
-        "trajectory": { "enum": ["pending", "improving", "stable", "worsening", "unknown"] },
+        "trajectory": { "enum": ["pending", "improving", "improved", "stable", "worsening", "unknown"] },
         "independent_review": { "enum": ["pending", "pass", "conditional", "fail", "not-required"] },
         "user_acceptance": { "enum": ["pending", "accepted", "rejected", "accepted-with-tradeoff"] }
+      }
+    },
+    "preservation_checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "candidate_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mask_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "mask_origin": {
+            "type": "array",
+            "prefixItems": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "integer",
+                "minimum": 0
+              }
+            ],
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "report_ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "source_ref",
+          "candidate_ref",
+          "mask_ref",
+          "mask_origin",
+          "report_ref"
+        ]
       }
     },
     "generation_attempts": {
@@ -130,6 +200,8 @@
           "trajectory_reason": { "type": "string", "minLength": 1 },
           "feedback_delta_refs": { "$ref": "#/$defs/stringArray" },
           "native_canvas_feedback_refs": { "$ref": "#/$defs/stringArray" },
+          "edit_plan_ref": { "type": "string", "minLength": 1 },
+          "edit_receipt_ref": { "type": "string", "minLength": 1 },
           "pre_generation_brief": {
             "type": "object",
             "additionalProperties": false,
@@ -154,8 +226,8 @@
             "properties": {
               "backend": { "type": "string", "minLength": 1 },
               "interface": { "type": "string", "minLength": 1 },
-              "model": { "type": "string", "minLength": 1 },
-              "model_version": { "type": "string", "minLength": 1 },
+              "model": { "type": ["string", "null"], "minLength": 1 },
+              "model_version": { "type": ["string", "null"], "minLength": 1 },
               "prompt_ref": { "type": "string", "minLength": 1 },
               "prompt_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
               "parameters": { "type": "object" },
@@ -177,8 +249,80 @@
               "generated_at": { "type": "string", "format": "date-time" },
               "output_ref": { "type": "string", "minLength": 1 },
               "output_sha256": { "type": "string", "pattern": "^[a-fA-F0-9]{64}$" },
-              "job_ref": { "type": "string", "minLength": 1 }
-            }
+              "job_ref": { "type": "string", "minLength": 1 },
+              "observation_limits": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "uniqueItems": true
+              },
+              "compiled_brief_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "revised_prompt_ref": {
+                "type": "string",
+                "minLength": 1
+              },
+              "actual_output_size": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "width": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "height": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "width",
+                  "height"
+                ]
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "anyOf": [
+                    {
+                      "properties": {
+                        "model": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "model"
+                      ]
+                    },
+                    {
+                      "properties": {
+                        "model_version": {
+                          "type": "null"
+                        }
+                      },
+                      "required": [
+                        "model_version"
+                      ]
+                    }
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "observation_limits"
+                  ],
+                  "properties": {
+                    "observation_limits": {
+                      "minItems": 1
+                    }
+                  }
+                }
+              }
+            ]
           },
           "attempt_review_ref": { "type": "string", "minLength": 1 },
           "attempt_comparison_ref": { "type": "string", "minLength": 1 },
@@ -229,7 +373,7 @@
     {
       "if": { "properties": { "phase": { "const": "accept" } } },
       "then": {
-        "required": ["release_review_ref", "user_decision_ref", "evidence_registry_ref"],
+        "required": ["release_review_ref", "user_decision_ref"],
         "properties": {
           "quality_status": {
             "properties": {
@@ -237,6 +381,22 @@
               "user_acceptance": { "enum": ["accepted", "accepted-with-tradeoff"] }
             }
           }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "approved_checkpoint": {
+            "properties": { "role": { "not": { "const": "none" } } },
+            "required": ["role"]
+          }
+        },
+        "required": ["approved_checkpoint"]
+      },
+      "then": {
+        "properties": {
+          "approved_checkpoint": { "required": ["source_ref"] }
         }
       }
     }

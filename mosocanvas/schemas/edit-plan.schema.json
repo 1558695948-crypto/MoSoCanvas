@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/edit-plan-0.1.json",
+  "title": "MoSoCanvas Bounded Edit Plan 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "id", "document_id", "expected_revision", "created_at", "target",
+    "depends_on", "base", "conditioning", "operation", "region", "capabilities", "expected_checks"
+  ],
+  "properties": {
+    "schema": { "const": "moso.edit-plan/0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "document_id": { "type": "string", "minLength": 1 },
+    "expected_revision": { "type": "integer", "minimum": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "target": { "type": "string", "minLength": 1 },
+    "depends_on": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    },
+    "base": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_ref", "path", "sha256", "width", "height"],
+      "properties": {
+        "asset_ref": { "type": "string", "minLength": 1 },
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "width": { "type": "integer", "minimum": 1 },
+        "height": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "conditioning": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy", "anchor_asset_ref", "included_operation_ids", "render_ref", "render_sha256"
+      ],
+      "properties": {
+        "policy": { "const": "clean-anchor-plus-explicit-dependencies" },
+        "anchor_asset_ref": { "type": "string", "minLength": 1 },
+        "included_operation_ids": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "render_ref": { "type": "string", "minLength": 1 },
+        "render_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "generation_scope", "commit_scope", "preservation_requirement"],
+      "properties": {
+        "scope": { "const": "region" },
+        "generation_scope": { "enum": ["cropped-context", "full-frame-context"] },
+        "commit_scope": { "const": "coverage-mask" },
+        "preservation_requirement": { "const": "exact-outside-write-mask" }
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coordinate_space", "read_box_xywh", "mask_origin_xy", "write_mask_ref",
+        "write_mask_sha256", "prepared_input_ref", "prepared_input_sha256",
+        "prepared_input_size", "mask_convention"
+      ],
+      "properties": {
+        "coordinate_space": { "const": "canvas-pixels-top-left" },
+        "read_box_xywh": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 1 },
+            { "type": "integer", "minimum": 1 }
+          ],
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "mask_origin_xy": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "integer", "minimum": 0 }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "write_mask_ref": { "type": "string", "minLength": 1 },
+        "write_mask_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "prepared_input_ref": { "type": "string", "minLength": 1 },
+        "prepared_input_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "prepared_input_size": {
+          "type": "array",
+          "prefixItems": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "integer", "minimum": 1 }
+          ],
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "mask_convention": { "const": "white-replace-black-protect-gray-blend" },
+        "preview_ref": { "type": "string", "minLength": 1 },
+        "preview_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["native_mask_argument", "deterministic_compositing", "pixel_preservation_from_model"],
+      "properties": {
+        "native_mask_argument": { "type": "boolean" },
+        "deterministic_compositing": { "const": true },
+        "pixel_preservation_from_model": { "const": "unverified" }
+      }
+    },
+    "expected_checks": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

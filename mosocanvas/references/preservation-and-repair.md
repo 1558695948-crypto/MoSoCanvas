@@ -15,7 +15,10 @@ content.
 
 Repeated repair is valuable when it preserves decisions and produces measurable improvement.
 Repeated full-frame synthesis is risky because a prompt-scoped request does not protect non-target
-pixels. The correct control is lineage plus verification, not a universal repair-count limit.
+pixels. Raw child-to-parent chaining also lets generated microstructure enter the next conditioning
+input. Keep a persistent clean anchor, explicit patch dependencies, lineage, and verification rather
+than using a universal repair-count limit. Follow
+[non-destructive-editing.md](non-destructive-editing.md) for the executable workflow.
 
 ## Choose the parent deliberately
 
@@ -28,9 +31,10 @@ Choose among:
 3. **Frozen Visual Spec:** regenerate a new branch when composition, material system, or subject
    must be rebuilt.
 
-Chaining V2 into V3 is allowed when V2 is genuinely better, the next repair depends on it, and the
-verification plan covers cumulative risk. Branch instead when the previous edit failed or added
-unrelated damage.
+Conditioning V3 on V2 is allowed only when V2 is accepted, the next repair truly depends on its local
+change, and that operation ID is explicit in the new plan. A later commit may still preserve other
+accepted patches on the canvas without showing them to the model. Branch from the clean anchor when
+the previous edit failed or added unrelated damage.
 
 ## Route by operation and risk
 
@@ -88,6 +92,49 @@ When tools allow:
 
 Pixel equality is inappropriate after compression or color-profile conversion. Perceptual
 similarity is not proof of exact preservation.
+
+## Executable pixel boundary
+
+`composite_region.py` accepts an explicitly prepared RGB/RGBA source and crop. The local mask is
+grayscale coverage: white replaces, black protects, gray blends all RGBA channels. It is not the
+transparent-alpha convention of an API mask. Source coordinates must have EXIF orientation already
+normalized. Convert palette/CMYK images explicitly before freezing the parent and selecting a mask.
+
+The helper outputs PNG, retains source alpha and ICC, rejects out-of-bounds crops, conflicting
+embedded ICC profiles, and attempts to overwrite inputs. An untagged crop uses the source's color
+interpretation; normalize it first when that assumption is not valid. Other metadata preservation
+is not guaranteed. Keep the accepted parent immutable.
+
+```bash
+python3 scripts/composite_region.py parent.png crop.png coverage.png \
+  --crop-origin 120,240 --output repaired.png
+python3 scripts/verify_mask_preservation.py parent.png repaired.png coverage.png \
+  --mask-origin 120,240 --output preservation.json
+```
+
+Verification compares decoded RGBA samples where coverage is zero, checks ICC identity, and binds
+source/candidate/mask file hashes. A full-white mask proves no protected region and is blocked.
+`status: pass` means those specific samples and ICC were preserved; it does not prove that the mask
+was correctly chosen, the semantic change succeeded, or the image is attractive.
+
+Attach an explicit check to run state when claiming exact preservation:
+
+```json
+{
+  "source_ref": "parent.png",
+  "candidate_ref": "repaired.png",
+  "mask_ref": "coverage.png",
+  "mask_origin": [120, 240],
+  "report_ref": "preservation.json"
+}
+```
+
+Place this in `preservation_checks`. The preflight validator recomputes measurements and checks
+hashes instead of trusting a stored pass. Use `method: "decoded-rgba-and-icc"` in the corresponding
+verification entry and bind its `evidence_ref` to the report. The claim applies only to the named
+candidate. At acceptance, replace paths with evidence IDs: source/candidate are artifacts; mask and
+report use kind `other`. Native Canvas coordinates or a semantic local edit provide localization
+intent only; a preservation guarantee still requires the measured candidate.
 
 ## Track quality debt
 

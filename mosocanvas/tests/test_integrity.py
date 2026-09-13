@@ -572,6 +572,22 @@ class ReviewIntegrityTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
 
+            # Acceptance resolves checkpoint evidence IDs through the registry, not as local paths.
+            production = json.loads(state.read_text())
+            production["mode"] = "production"
+            production["approved_checkpoint"] = {"role": "composition-proof", "source_ref": "proof", "sha256": sha256(proof)}
+            production["allowed_changes"] = ["render the approved mass map"]
+            production["protected_elements"] = ["dark mass position"]
+            write_json(state, production)
+            result = run_script("preflight_validate.py", state, "--registry", registry)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            production["approved_checkpoint"]["sha256"] = "0" * 64
+            write_json(state, production)
+            result = run_script("preflight_validate.py", state, "--registry", registry)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("checkpoint sha256", result.stdout)
+
+
 class TrendIntegrityTests(unittest.TestCase):
     def build_snapshot(self, root: Path) -> Path:
         snapshot = root / "trend.json"

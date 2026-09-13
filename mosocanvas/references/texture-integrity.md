@@ -76,13 +76,15 @@ material distinction, or violates an explicit production requirement.
 Use the lowest-risk method that can plausibly improve the defect:
 
 1. deterministic frequency or texture retouching inside a reviewed material mask;
-2. masked or region-scoped synthesis from the best accepted checkpoint;
+2. masked or region-scoped synthesis conditioned from a persistent clean anchor plus explicit
+   accepted dependencies;
 3. a new branch from an earlier clean checkpoint;
 4. clean regeneration from the frozen Visual Spec when contamination is global.
 
-Multiple repairs are allowed. Every round needs a named parent, bounded target, pass condition, and
-trend comparison. Do not use a failed texture repair as the next parent unless the user explicitly
-accepts the tradeoff and the next operation depends on it.
+Multiple repairs are allowed. Every round needs a named commit base, clean conditioning anchor,
+bounded target, pass condition, and trend comparison. Never use a failed or merely generated texture
+repair as model conditioning. An accepted prior patch enters conditioning only as an explicit
+operation dependency.
 
 Pattern removal is necessary but not sufficient. Reject a smoother result when anatomy, material,
 lighting, identity, hierarchy, or protected content becomes worse.

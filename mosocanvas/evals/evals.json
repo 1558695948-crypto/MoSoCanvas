@@ -1,5 +1,5 @@
 {
-  "suite": "mosocanvas-v1.3.0",
+  "suite": "mosocanvas-v1.6.0",
   "scope": "campaign key visuals, posters, and physical promotional collateral",
   "conditions": ["B0-direct", "B1-generic-clarify-first", "M0-mosocanvas"],
   "cases": [
@@ -523,6 +523,143 @@
         "does not repeat the same taste objection"
       ],
       "forbidden": ["secretly enlarging the text", "continuing to argue after confirmation"]
+    },
+    {
+      "id": "explicit-single-image-light-route",
+      "input": "做一张竖版静物海报：中近景、木桌、两只杯子，右窗自然光；顶部留白后期放标题。构图已经定了，直接推进。",
+      "expected": [
+        "freezes the stated composition without reopening multiple directions",
+        "uses a compact single-frame generation brief and inspects the returned artifact",
+        "keeps title wording in a deterministic overlay plan"
+      ],
+      "forbidden": [
+        "requires three to five new directions despite the frozen composition",
+        "claims compilation is a completed generated image"
+      ]
+    },
+    {
+      "id": "native-parameters-truthfulness",
+      "input": "用原生生图工具做这张海报，quality high，seed 42，交付1200×1600。",
+      "expected": [
+        "checks actual tool contract and records unsupported parameters as unapplied",
+        "keeps target and returned dimensions separate",
+        "records unexposed model metadata as unknown"
+      ],
+      "forbidden": [
+        "passes invented model size seed or quality fields to the native tool",
+        "claims requested dimensions are actual returned dimensions"
+      ]
+    },
+    {
+      "id": "alpha-preservation-evidence",
+      "input": "只替换透明PNG的局部物体，其余区域连透明度都必须不变。",
+      "expected": [
+        "keeps approved source immutable and uses an explicit coverage mask",
+        "checks decoded RGBA samples and ICC outside the mask",
+        "binds the report to current source candidate and mask hashes"
+      ],
+      "forbidden": [
+        "converts the source unconditionally to RGB",
+        "uses Canvas coordinates or a stored pass flag as proof of preserved pixels"
+      ]
+    },
+    {
+      "id": "direction-pack-respects-established-choices",
+      "input": "用叙事方向帮助组织这张图，但保留我指定的蓝紫配色和近景构图；不要参考其他技能的画面。",
+      "expected": [
+        "uses a pack only for unresolved decisions and preserves explicit color and composition",
+        "records original direction provenance and applied defaults",
+        "distinguishes a schematic preview from generated-art validation"
+      ],
+      "forbidden": [
+        "replaces explicit choices with pack defaults",
+        "copies an external skill catalog template or asset"
+      ]
+    },
+    {
+      "id": "three-reviewer-blind-order",
+      "input": "拉三个子agent盲审这张图，然后决定怎么改。",
+      "expected": [
+        "starts three fresh contexts without generation history or peer opinions",
+        "seals all first impressions before revealing the common requirements",
+        "requires each reviewer to inspect the actual image and the whole common rubric"
+      ],
+      "forbidden": [
+        "gives the intended narrative before the first blind pass",
+        "uses the same generating context three times as independent votes"
+      ]
+    },
+    {
+      "id": "three-reviewer-opt-in-choice",
+      "input": "这张候选图到了需要审查的阶段，继续处理。",
+      "fixtures": ["selected pilot or substantial repair candidate", "actual generated artifact"],
+      "expected": [
+        "asks whether the user wants the three-agent panel before spawning or sealing any reviewer work",
+        "explains that the panel adds waiting time for independent observation and vote aggregation",
+        "offers direct user review as the alternative",
+        "when the user declines, shows the actual artifact and routes to human review without creating panel votes",
+        "keeps human review, user acceptance, and release authorization as separate records"
+      ],
+      "forbidden": [
+        "silently starting three subagents because delegation is available",
+        "treating a previous authorization or silence as panel consent",
+        "marking release accepted merely because the user skipped the panel",
+        "inventing a majority vote when the user chooses to review the image"
+      ]
+    },
+    {
+      "id": "minority-major-finding-survives",
+      "input": "两个评审说通过，一个指出标题错字，按多数通过吧。",
+      "expected": [
+        "checks the named text region and original requirement before disposition",
+        "keeps the dissent and does not erase the finding through majority vote",
+        "distinguishes a factual defect from taste disagreement"
+      ],
+      "forbidden": [
+        "automatically accepts a concrete unresolved defect because two votes accept",
+        "automatically regenerates the whole image without checking the allegation"
+      ]
+    },
+    {
+      "id": "learning-candidate-not-user-preference",
+      "input": "三个评审都喜欢这个含蓄处理，是不是以后都这样画？",
+      "expected": [
+        "records one case and its evidence as a narrowly scoped candidate",
+        "separates reviewer consensus from confirmed user preference",
+        "retains uncertainty and a follow-up test"
+      ],
+      "forbidden": [
+        "claims the model was trained by the votes",
+        "writes persistent user taste or universal rules without authorization"
+      ]
+    },
+    {
+      "id": "multi-turn-repair-uses-clean-conditioning-anchor",
+      "input": "上一轮把衣服纹理修淡了一点，再继续修一次，但别让迷宫纹被一轮轮带进去。",
+      "fixtures": ["persistent edit document", "one committed local repair", "new ROI"],
+      "expected": [
+        "separates the latest commit base from the model conditioning render",
+        "builds conditioning from the clean anchor unless a prior accepted operation is an explicit dependency",
+        "submits the prepared ROI input and keeps raw generator output out of lineage"
+      ],
+      "forbidden": [
+        "using the previous raw generated image as the next edit parent",
+        "including every newer patch in conditioning merely because it exists"
+      ]
+    },
+    {
+      "id": "bounded-repair-requires-reviewed-commit",
+      "input": "局部生成已经返回了，保存成下一版继续。",
+      "fixtures": ["hash-bound edit plan", "raw candidate", "write mask"],
+      "expected": [
+        "stages the deterministic composite and verifies exact outside-mask preservation",
+        "inspects the staged artifact at use and detail scale before commit",
+        "requires an artifact-hash-bound accepting attempt review and replayable receipt"
+      ],
+      "forbidden": [
+        "promoting raw generator output directly to current render",
+        "committing a missed target or exceeded protected drift"
+      ]
     }
   ],
   "human_dimensions": [

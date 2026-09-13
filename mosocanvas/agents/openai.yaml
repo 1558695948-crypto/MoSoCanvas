@@ -1,4 +1,4 @@
 interface:
   display_name: "MoSoCanvas"
-  short_description: "把 Canvas 反馈绑定到版本与保护约束，并逐轮审查真实输出"
-  default_prompt: "Use $mosocanvas to bind my Codex Image Canvas feedback to the correct version, preserve approved elements, and review the actual result."
+  short_description: "从视觉命题编译可执行图像请求，保留已定构图与反馈约束，并检查真实输出"
+  default_prompt: "Use $mosocanvas to turn my visual brief into a concrete image request, preserve approved decisions and inspect the actual result. Before any eligible three-agent image review, ask whether I want the panel, explain that it adds waiting time, and let me review the artifact myself if I decline."

@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mosocanvas.local/schemas/edit-receipt-0.1.json",
+  "title": "MoSoCanvas Edit Commit Receipt 0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema", "operation_id", "document_id", "from_revision", "to_revision", "committed_at",
+    "plan", "candidate", "attempt_review", "patch_asset_ref", "mask_asset_ref", "render_asset_ref",
+    "preservation_report_ref", "preservation_status"
+  ],
+  "properties": {
+    "schema": { "const": "moso.edit-receipt/0.1" },
+    "operation_id": { "type": "string", "minLength": 1 },
+    "document_id": { "type": "string", "minLength": 1 },
+    "from_revision": { "type": "integer", "minimum": 1 },
+    "to_revision": { "type": "integer", "minimum": 2 },
+    "committed_at": { "type": "string", "format": "date-time" },
+    "plan": { "$ref": "#/$defs/fileBinding" },
+    "candidate": { "$ref": "#/$defs/fileBinding" },
+    "attempt_review": { "$ref": "#/$defs/fileBinding" },
+    "patch_asset_ref": { "type": "string", "minLength": 1 },
+    "mask_asset_ref": { "type": "string", "minLength": 1 },
+    "render_asset_ref": { "type": "string", "minLength": 1 },
+    "preservation_report_ref": { "type": "string", "minLength": 1 },
+    "preservation_status": { "const": "pass" }
+  },
+  "$defs": {
+    "fileBinding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1 },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    }
+  }
+}
