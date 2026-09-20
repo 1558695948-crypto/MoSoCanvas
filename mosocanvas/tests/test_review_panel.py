@@ -134,6 +134,25 @@ class ReviewPanelTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "common rubric"):
             aggregate(self.seal, self.spec, self.votes)
 
+    def test_selective_spec_requires_selection_and_keeps_its_dissent(self):
+        self.write(self.spec, json.loads((ROOT / "examples/selective-expression-spec.example.json").read_text()))
+        for path in self.votes:
+            vote = json.loads(path.read_text())
+            vote["spec_sha256"] = sha256(self.spec)
+            self.write(path, vote)
+        with self.assertRaisesRegex(ValueError, "selection findings"):
+            aggregate(self.seal, self.spec, self.votes)
+        for i in range(3):
+            self.change_review(i, lambda r: r["spec_pass"].update(selection=[{
+                "severity": 0, "claim": "essential relation survives", "evidence_region": "figure to array gap",
+                "consequence": "background omission does not erase the core relation", "confidence": "medium"}]))
+        self.assertEqual(aggregate(self.seal, self.spec, self.votes)["recommended_next_action"], "accept")
+        self.change_review(2, lambda r: r["spec_pass"]["selection"][0].update(
+            severity=2, claim="depth obscures the essential relation", alternative_explanation="possibly intentional scale ambiguity"))
+        result = aggregate(self.seal, self.spec, self.votes)
+        self.assertEqual(result["recommended_next_action"], "verify-findings")
+        self.assertEqual(result["findings_requiring_verification"][0]["category"], "selection")
+
 
 if __name__ == "__main__":
     unittest.main()

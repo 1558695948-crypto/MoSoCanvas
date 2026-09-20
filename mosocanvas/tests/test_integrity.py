@@ -399,6 +399,38 @@ class ReviewIntegrityTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
+    def test_selective_spec_requires_selection_review_and_cannot_hide_blockers(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            review, registry = self.build_authorized_review(root)
+            spec_path = root / "spec.json"
+            write_json(spec_path, json.loads((SKILL / "examples/selective-expression-spec.example.json").read_text()))
+
+            def refresh_registry():
+                value = json.loads(registry.read_text())
+                for entry in value["entries"]:
+                    path = root / entry["content_ref"]
+                    entry.update(sha256=sha256(path), size_bytes=path.stat().st_size)
+                write_json(registry, value)
+
+            refresh_registry()
+            result = run_script("review_validate.py", review, "--registry", registry)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("requires selection findings", result.stdout)
+            value = json.loads(review.read_text())
+            value["spec_pass"]["selection"] = [self.finding("selection")]
+            write_json(review, value)
+            refresh_registry()
+            result = run_script("review_validate.py", review, "--registry", registry)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            value["spec_pass"]["selection"][0].update(severity=3, claim="required subject lost",
+                alternative_explanation="possibly obscured at this scale")
+            write_json(review, value)
+            refresh_registry()
+            result = run_script("review_validate.py", review, "--registry", registry)
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("severity-3", result.stdout)
+
     def test_same_context_review_is_blocked(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

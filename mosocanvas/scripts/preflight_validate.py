@@ -383,7 +383,7 @@ def validate_release_evidence(
             spec_document = load_object(resolved[str(spec_id)], "visual spec")
             if spec_document.get("schema") not in {
                 "moso.visual-spec/0.1", "moso.visual-spec/0.2",
-                "moso.visual-spec/0.3", "moso.visual-spec/0.4", "moso.visual-spec/0.5"
+                "moso.visual-spec/0.3", "moso.visual-spec/0.4", "moso.visual-spec/0.5", "moso.visual-spec/0.6"
             }:
                 blockers.append("registered visual spec has the wrong schema")
         except EvidenceError as exc:

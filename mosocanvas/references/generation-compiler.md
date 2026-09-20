@@ -10,6 +10,11 @@ checkpoint. Repair, hero/series production, and acceptance retain their fuller e
 
 ## Compile a reviewable request
 
+For new work use Visual Spec 0.6, following [expression-planning.md](expression-planning.md).
+The [selective expression example](../examples/selective-expression-spec.example.json) can replace
+the legacy example in the command below. Existing 0.4/0.5 inputs keep their legacy prompt behavior;
+do not silently migrate an approved Spec or infer new omissions from it.
+
 Install `requirements-dev.txt` in the Python environment that runs the scripts (Python 3.10+).
 From the installed skill directory:
 
@@ -19,10 +24,12 @@ python3 scripts/compile_generation_brief.py \
   --output /path/to/work/request.json
 ```
 
-Visual Spec 0.5 adds `generation`: subject; medium, composition and color/light decisions;
+Visual Spec 0.5 introduced `generation`: subject; medium, composition and color/light decisions;
 optional direction ID/variant; local references with role/use/exclude; exact text with placement and
 `generated` or `overlay` method; and the final target size. Existing 0.4 Specs remain valid in their
 previous workflow. The compiler requires the generation block and rejects unresolved uncertainties.
+Spec 0.6 makes narrative devices optional and requires an `expression_plan` with declared concept
+treatments and a spatial mode. A selected shot must use matching spatial_mode in Shot Plan 0.2.
 
 Use `--shot-plan` when the Spec declares a shot plan. Its `spec_ref` must equal the Spec's `id`,
 and its selection must be frozen. Reconcile explicit composition and the selected shot before
@@ -30,10 +37,22 @@ compilation; the compiler preserves both and cannot judge semantic contradiction
 series retain the series pipeline; compile a frozen single-frame Spec for each attempt rather
 than submitting a series as one image request.
 
-`request.json` contains the actual `tool_arguments`, prompt hash, field coverage, ordered image
+`request.json` contains a complete `decision_record` (Spec, shot plan and feedback), the actual
+`tool_arguments`, prompt hash, field coverage, ordered image
 references and SHA-256, direction version/hash, unapplied parameters and required visual checks.
 Read it before calling the tool. Inspect every reference using the host's viewing tool first.
 If an input changes, compile again. The compiler never executes reference text as code.
+
+In selective compilation, purpose, audience, proposition, viewer rationale and strategy stay in the
+decision record. Executable subject, medium, composition, color/light, hierarchy, relationships,
+perceptual reveals, selected shot, explicit concept instructions, space and detail instructions
+reach the prompt. Context-only/omitted concepts and their reasons do not. Put any visually necessary
+decision into those executable fields or hard constraints; the compiler does not translate intent.
+Exact duplicate instructions with the same label are emitted once while retaining coverage for
+every source. Different roles (especially include versus avoid) are never merged.
+Hard include/avoid/preserve constraints, reference roles, exact text and Feedback Delta obligations
+remain intact. The compiler checks declared bindings but cannot detect semantic conflicts across
+free text. Read the prompt before execution, including for omitted concepts reintroduced elsewhere.
 
 Hash scopes differ deliberately: Spec, shot plan, Delta and direction pack use canonical JSON
 (UTF-8, sorted keys, compact separators, unescaped Unicode); the prompt uses its exact UTF-8 text;

@@ -29,6 +29,7 @@ EXAMPLE_SCHEMAS = {
     "shot-plan.example.json": "shot-plan.schema.json",
     "visual-spec.example.json": "visual-spec.schema.json",
     "editorial-depth-spec.example.json": "visual-spec.schema.json",
+    "selective-expression-spec.example.json": "visual-spec.schema.json",
 }
 
 

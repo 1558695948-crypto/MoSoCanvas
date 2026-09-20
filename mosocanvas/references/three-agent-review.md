@@ -16,8 +16,9 @@ Before step 1, ask once when this candidate is eligible for a panel:
 Wait for the user's choice before spawning, sealing, or preparing votes. If the user chooses not to
 use the panel, stop this protocol and use the human-review route:
 
-1. Show the actual artifact and the compact rubric (carrier read, composition, narrative,
-   color/light, material/physics, AI residue and spec fit).
+1. Show the actual artifact and the compact rubric (carrier read, composition, applicable narrative,
+   color/light, material/physics, AI residue and spec fit). For Spec 0.6 include the selection checks
+   in [expression-planning.md](expression-planning.md).
 2. Ask the user to accept, request a local repair, regenerate, branch, or leave it for judgment.
 3. Record the human review and the user decision separately. A human review can satisfy an
    independent-review evidence requirement when it actually inspects the artifact, but it does not
@@ -46,12 +47,16 @@ the panel starts a new panel with a fresh candidate/context as required below.
    read, eye path, inferred narrative, anomalies, strengths and uncertainties. All three inspect
    composition, narrative, color/light, physical plausibility and visible artifacts. Optional extra
    attention areas do not replace the common rubric. Record viewing scale and limitations.
+   A truthful lack of inferred narrative is valid; do not invent a story for decorative or direct work.
 4. Wait for all three first passes. Seal their exact bytes with the command below **before** exposing
    the requirements. Do not rewrite observations after learning the intended meaning.
 5. Give each same-context reviewer the same bounded review brief/Spec and its own sealed observation.
    Never send another reviewer's findings. Each writes an [artifact review](../schemas/artifact-review.schema.json)
    and [vote](../schemas/panel-vote.schema.json). All seven Spec categories require actual findings,
    including positive findings. Preserve the original blind_pass verbatim.
+   For Spec 0.6 also include `spec_pass.selection` on meaning retained, attention, detail/depth
+   function, and omission benefits and losses. Keep the Spec schema identifier in a bounded brief
+   so the aggregator can require this category. The same category applies to dense and sparse work.
 6. Wait for all three committed votes, then aggregate. A new candidate needs new fresh contexts for
    a genuinely blind first pass; reviewers that already know the intent cannot repeat it as blind.
 

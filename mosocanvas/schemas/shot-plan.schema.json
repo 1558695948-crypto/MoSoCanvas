@@ -1,12 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mosocanvas.local/schemas/shot-plan-0.1.json",
-  "title": "MoSoCanvas Shot Plan 0.1",
+  "$id": "https://mosocanvas.local/schemas/shot-plan-0.2.json",
+  "title": "MoSoCanvas Shot Plan 0.2 (0.1 compatible)",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema", "id", "spec_ref", "carrier", "candidates", "selection"],
   "properties": {
-    "schema": { "const": "moso.shot-plan/0.1" },
+    "schema": { "enum": ["moso.shot-plan/0.1", "moso.shot-plan/0.2"] },
     "id": { "type": "string", "minLength": 1 },
     "spec_ref": { "type": "string", "minLength": 1 },
     "carrier": {
@@ -46,6 +46,31 @@
       ]
     }
   },
+  "allOf": [{
+    "if": { "properties": { "schema": { "const": "moso.shot-plan/0.1" } } },
+    "then": { "properties": { "candidates": { "items": {
+      "required": ["narrative_verb", "viewer_position", "camera", "depth_layers"],
+      "properties": { "depth_layers": { "minItems": 2 } }
+    } } } },
+    "else": { "properties": { "candidates": { "items": {
+      "required": ["spatial_mode"],
+      "allOf": [
+        {
+          "if": { "properties": { "spatial_mode": { "const": "flat" } } },
+          "then": {
+            "properties": { "depth_layers": { "maxItems": 1 } }
+          }
+        },
+        {
+          "if": { "properties": { "spatial_mode": { "enum": ["deep", "mixed"] } } },
+          "then": {
+            "required": ["depth_layers", "spatial_reason"],
+            "properties": { "depth_layers": { "minItems": 2 } }
+          }
+        }
+      ]
+    } } } }
+  }],
   "$defs": {
     "stringArray": { "type": "array", "items": { "type": "string", "minLength": 1 }, "uniqueItems": true },
     "point": {
@@ -60,9 +85,11 @@
     "shot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["shot_id", "narrative_verb", "viewer_position", "camera", "masses", "vectors", "depth_layers", "value_plan", "failure_signs"],
+      "required": ["shot_id", "masses", "vectors", "value_plan", "failure_signs"],
       "properties": {
         "shot_id": { "type": "string", "minLength": 1 },
+        "spatial_mode": { "enum": ["flat", "shallow", "deep", "mixed"] },
+        "spatial_reason": { "type": "string", "minLength": 1 },
         "narrative_verb": { "type": "string", "minLength": 1 },
         "viewer_position": { "type": "string", "minLength": 1 },
         "camera": {
@@ -98,7 +125,7 @@
           }
         },
         "vectors": { "$ref": "#/$defs/stringArray" },
-        "depth_layers": { "type": "array", "minItems": 2, "items": { "type": "string", "minLength": 1 } },
+        "depth_layers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
         "first_fixation": { "$ref": "#/$defs/point" },
         "horizon_y_pct": { "type": "number", "minimum": 0, "maximum": 100 },
         "value_plan": {

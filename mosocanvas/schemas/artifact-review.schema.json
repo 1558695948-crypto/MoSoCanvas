@@ -47,7 +47,12 @@
         "color_light": { "$ref": "#/$defs/findingList" },
         "material_physics": { "$ref": "#/$defs/findingList" },
         "ai_residue": { "$ref": "#/$defs/findingList" },
-        "spec_fit": { "$ref": "#/$defs/findingList" }
+        "spec_fit": { "$ref": "#/$defs/findingList" },
+        "selection": {
+          "description": "Evidence on core meaning, attention competition, detail/depth function and the benefit AND loss of proposed omissions. Required by the review workflow for Visual Spec 0.6.",
+          "$ref": "#/$defs/findingList",
+          "minItems": 1
+        }
       }
     },
     "series_pass": {

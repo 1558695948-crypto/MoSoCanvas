@@ -4,15 +4,21 @@ Use this before generating a zero-reference hero image or series.
 
 ## Build the shot from relations
 
-Record these fields rather than prose such as “cinematic composition”:
+Choose a spatial mode in Shot Plan 0.2: `flat`, `shallow`, `deep` or `mixed`. Keep it consistent
+with the Spec's expression plan. Flat layouts need no camera or horizon and may omit depth layers
+or name one plane; an overhead flat-lay photograph may still specify a camera. Depth layers describe
+spatial planes, not compositing layers. Shallow space can have a single working plane. Deep/mixed space records its
+function and at least two layers; depth is valid when it serves the task.
+
+Record applicable fields rather than prose such as “cinematic composition”:
 
 - frame and intended crop;
-- camera height, yaw, pitch, distance, and lens behavior;
+- camera height, yaw, pitch, distance, and lens behavior when a camera model applies;
 - subject envelope as percentages of frame width and height;
 - dominant mass, counter-mass, and negative-space owner;
-- horizon or primary plane;
+- horizon or primary plane when applicable;
 - gaze, gesture, motion, and architectural vectors;
-- occlusion layers and depth order;
+- occlusion layers and depth order when the selected spatial mode uses them;
 - highest contrast region and first fixation target;
 - edge contacts, tangencies, and crop pressure;
 - safe zones required by the carrier.
@@ -31,8 +37,8 @@ The thumbnail passes when:
 
 - the first-read mass relation survives without texture;
 - the intended subject does not depend on tiny details;
-- negative space has a function;
-- the eye path can be described in two or three moves;
+- intervals and any quiet areas have a function; quiet does not have to mean blank;
+- the attention pattern fits the viewing task, whether focused or distributed;
 - the crop does not create accidental tangencies;
 - the carrier overlay does not destroy the hierarchy.
 
@@ -60,6 +66,11 @@ Treat these as contextual mechanisms, not universal emotional laws.
 - **Decorative occlusion:** visual clutter that hides rather than reveals information.
 
 Repair structure before adding detail or stronger styling.
+
+Distribute detail deliberately: name regions and the contrast, edge, texture or repetition behavior
+that makes them focal, supporting or quiet. Do not impose a fixed element limit, blank-space ratio
+or attention percentage. Dense patterns and large deep scenes can be well organized. Review the
+function of complexity and the information lost by reducing it.
 
 ## Series coverage
 

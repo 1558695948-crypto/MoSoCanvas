@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 from pathlib import Path
@@ -72,6 +73,31 @@ def resolve_file(ref: str, base: Path) -> Path:
     return path.resolve() if path.is_absolute() else (base / path).resolve()
 
 
+def validate_expression_plan(spec: dict, shot: dict | None) -> None:
+    """Check declared bindings, never infer semantic equivalence or permission to omit."""
+    expression = spec["expression_plan"]
+    concepts = expression["concepts"]
+    if len({item["id"] for item in concepts}) != len(concepts):
+        raise ValueError("expression concept IDs must be unique")
+    relationships = spec.get("relationships", [])
+    relationship_ids = {item["id"] for item in relationships}
+    if len(relationship_ids) != len(relationships):
+        raise ValueError("relationship IDs must be unique")
+    hard_content = set(spec["constraints"]["must_include"] + spec["constraints"]["preserve"])
+    for item in concepts:
+        if item["treatment"] in {"context-only", "omit"} and item["concept"] in hard_content:
+            raise ValueError("a hard constraint cannot be routed to context-only or omit")
+        for ref in item.get("relationship_refs", []):
+            if ref not in relationship_ids:
+                raise ValueError(f"unknown expression relationship: {ref}")
+        for ref in item.get("constraint_refs", []):
+            field, index = ref.removeprefix("constraints.").rstrip("]").split("[")
+            if int(index) >= len(spec["constraints"][field]):
+                raise ValueError(f"unknown expression constraint: {ref}")
+    if shot and shot.get("spatial_mode") != expression["space"]["mode"]:
+        raise ValueError("selected shot spatial_mode must match expression_plan.space.mode; use Shot Plan 0.2")
+
+
 def compile_brief(
     spec: dict,
     *,
@@ -98,12 +124,22 @@ def compile_brief(
     coverage: list[dict] = []
     blocks: list[str] = []
     overlay: list[dict] = []
+    selective = spec["schema"] == "moso.visual-spec/0.6"
+    emitted: dict[tuple[str, str], str] = {}
 
     def add(label: str, value: str, source: str) -> None:
+        key = (label, value)  # Identical nouns under include/avoid have different obligations.
+        if selective and key in emitted:
+            coverage.append({"source": source, "destination": "prompt", "value": value,
+                             "reuses": emitted[key]})
+            return
         blocks.append(f"{label}：{value}")
+        emitted[key] = source
         coverage.append({"source": source, "destination": "prompt", "value": value})
 
     shot = selected_shot(plan, spec) if plan else None
+    if selective:
+        validate_expression_plan(spec, shot)
     pack = variant = None
     if "direction" in g:
         if g.get("parent") or delta:
@@ -129,28 +165,54 @@ def compile_brief(
         else:
             raise ValueError(f"generation.{field} needs an explicit decision or a selected direction default")
 
-    add("用途", spec["task"]["purpose"] + "；" + spec["task"]["output_context"], "task")
-    if spec["task"].get("audience"):
-        add("观众", spec["task"]["audience"], "task.audience")
-    for field, value in spec["proposition"].items():
-        add("画面命题 " + field, value, "proposition." + field)
+    if selective:
+        for field in ("task", "proposition", "viewer_contract", "strategy"):
+            coverage.append({"source": field, "destination": "decision_record", "value": spec[field]})
+        add("用途", spec["task"]["domain"], "task.domain")
+    else:
+        add("用途", spec["task"]["purpose"] + "；" + spec["task"]["output_context"], "task")
+        if spec["task"].get("audience"):
+            add("观众", spec["task"]["audience"], "task.audience")
+        for field, value in spec["proposition"].items():
+            add("画面命题 " + field, value, "proposition." + field)
     add("主体", g["subject"], "generation.subject")
     add("媒介", resolved["medium"], resolved_sources["medium"])
-    viewer = spec["viewer_contract"]
-    add("观看关系", f"{viewer['position']}；{viewer['information_power']}", "viewer_contract")
-    add("第一读", viewer["first_read"], "viewer_contract.first_read")
-    add("第二读", viewer["second_read"], "viewer_contract.second_read")
-    add("暂不揭示", viewer["withheld"], "viewer_contract.withheld")
+    if not selective:
+        viewer = spec["viewer_contract"]
+        add("观看关系", f"{viewer['position']}；{viewer['information_power']}", "viewer_contract")
+        add("第一读", viewer["first_read"], "viewer_contract.first_read")
+        add("第二读", viewer["second_read"], "viewer_contract.second_read")
+        add("暂不揭示", viewer["withheld"], "viewer_contract.withheld")
     add("画面组织", resolved["composition"], resolved_sources["composition"])
     add("色彩与照明", resolved["color_light"], resolved_sources["color_light"])
     for field, value in spec["hierarchy"].items():
         add("视觉层级 " + field, "；".join(value) if isinstance(value, list) else value, "hierarchy." + field)
-    for field in ("selected_direction", "structural_mechanisms", "familiar_rule", "designed_anomaly"):
-        value = spec["strategy"][field]
-        add("结构意图 " + field, "；".join(value) if isinstance(value, list) else value, "strategy." + field)
+    if selective:
+        expression = spec["expression_plan"]
+        for i, item in enumerate(expression["concepts"]):
+            source = f"expression_plan.concepts[{i}]"
+            coverage.append({"source": source, "destination": "decision_record",
+                             "treatment": item["treatment"], "value": item})
+            if item["treatment"] == "explicit":
+                add("可见表达", item["render_instruction"], source + ".render_instruction")
+            elif item["treatment"] == "relational":
+                coverage.append({"source": source, "destination": "prompt",
+                                 "treatment": "relational", "relationship_refs": item["relationship_refs"]})
+        add("空间方式", expression["space"]["mode"], "expression_plan.space.mode")
+        add("空间组织", expression["space"]["instruction"], "expression_plan.space.instruction")
+        if "reason" in expression["space"]:
+            coverage.append({"source": "expression_plan.space.reason", "destination": "decision_record",
+                             "value": expression["space"]["reason"]})
+        for i, item in enumerate(expression.get("detail_distribution", [])):
+            add("细节分布", f"{item['region']}：{item['instruction']}", f"expression_plan.detail_distribution[{i}]")
+    else:
+        for field in ("selected_direction", "structural_mechanisms", "familiar_rule", "designed_anomaly"):
+            value = spec["strategy"][field]
+            add("结构意图 " + field, "；".join(value) if isinstance(value, list) else value, "strategy." + field)
     if shot:
         for name in ("camera", "masses", "value_plan"):
-            add(f"已选构图 {name}", json.dumps(shot[name], ensure_ascii=False), f"shot.{name}")
+            if name in shot:
+                add(f"已选构图 {name}", json.dumps(shot[name], ensure_ascii=False), f"shot.{name}")
         for name in ("vectors", "depth_layers", "safe_zones"):
             if shot.get(name):
                 add(f"已选构图 {name}", "；".join(shot[name]), f"shot.{name}")
@@ -289,7 +351,10 @@ def compile_brief(
     if delta:
         checks.extend(item["pass_condition"] for item in delta["verification"])
     return {
-        "schema": "moso.compiled-brief/0.2", "spec_id": spec["id"], "spec_version": spec["version"],
+        "schema": "moso.compiled-brief/0.3", "spec_id": spec["id"], "spec_version": spec["version"],
+        "compilation_mode": "selective" if selective else "legacy",
+        "decision_record": {"spec": copy.deepcopy(spec), "shot_plan": copy.deepcopy(plan),
+                            "feedback_delta": copy.deepcopy(delta)},
         "hash_conventions": {"structured_inputs_and_direction": "SHA-256 of UTF-8 JSON with sorted keys, compact separators and unescaped Unicode",
                              "prompt": "SHA-256 of exact UTF-8 prompt text", "reference_images": "SHA-256 of file bytes"},
         "input_hashes": {"spec": canonical_digest(spec), "shot_plan": canonical_digest(plan) if plan else None, "feedback_delta": canonical_digest(delta) if delta else None,

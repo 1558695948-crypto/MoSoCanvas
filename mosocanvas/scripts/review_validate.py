@@ -8,13 +8,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from review_integrity import validate_authorized_review
-
-
-CATEGORIES = (
-    "carrier", "composition", "narrative", "color_light",
-    "material_physics", "ai_residue", "spec_fit"
-)
+from review_integrity import CATEGORIES, review_categories, validate_authorized_review
 
 
 def load(path: Path) -> dict[str, Any]:
@@ -65,8 +59,10 @@ def main() -> int:
 
     blocker_findings = 0
     unsupported_major = 0
-    for category in CATEGORIES:
+    for category in review_categories(spec):
         findings = spec.get(category) or []
+        if category == "selection" and not findings:
+            blockers.append("spec_pass.selection requires recorded findings")
         if not isinstance(findings, list):
             blockers.append(f"spec_pass.{category} must be a list")
             continue

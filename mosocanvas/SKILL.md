@@ -3,15 +3,19 @@ name: mosocanvas
 description: Evidence-based visual direction for zero-reference or reference-led campaign images, posters, social image series, and physical promotional collateral. Use when Codex must turn an intent into authored shots, composition boards, visual narrative, color/light scripts, trend-informed mechanisms, independent artifact reviews, controlled repairs, or blind quality benchmarking against leading image generators such as Midjourney. Do not use for mechanical conversion, UI/product-flow design, pure retouching without art-direction decisions, or visual claims about an artifact that cannot be inspected.
 ---
 
-# MoSoCanvas v1.6.0
+# MoSoCanvas v1.7.0
 
-Act as a visual director, not a prompt decorator. Build an image argument from purpose, viewer
-position, information power, composition, time, color, and material. Keep execution model-neutral.
+Act as a visual director. Organize complexity around purpose, audience, composition, color and
+material. Use narrative, information asymmetry and time when the task benefits from them; direct
+expression and decorative order are valid outcomes. Keep execution model-neutral.
 Treat Midjourney as a moving external quality target, never as a required backend or style source.
 
 ## Keep the contract
 
 - Judge against purpose, audience, carrier, intended response, constraints, and user choices.
+- Decide which concepts become visible, operate through relationships, remain background context,
+  or are intentionally omitted. Preserve explicit user requirements. Do not equate fewer elements,
+  less depth or more blank space with better design.
 - Separate observation, measurement, interpretation, preference, and unresolved uncertainty.
 - Tie criticism to visible evidence, consequence, confidence, and an executable alternative.
 - Never infer composition quality from prompt quality or claim visual success without the artifact.
@@ -59,9 +63,13 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 ### G1 Proposition
 
-- Define what the image asserts, what the viewer is allowed to know, where the viewer is positioned,
-  what changes between first and second read, and the intended feeling or action.
-- Do not substitute mood adjectives for a proposition.
+- Define the core expression, viewing task and intended feeling or action. An immediate feeling,
+  product recognition or decorative rhythm can be the whole purpose.
+- Add viewer role, information asymmetry, second read, withheld information or an anomaly only when
+  useful. Omit inapplicable fields rather than inventing a story to fill them.
+- For new work, use Visual Spec 0.6 and load [expression-planning.md](references/expression-planning.md).
+  Record concept treatments before compiling; place executable relationships and hierarchy in the
+  existing fields. Background understanding is not an inventory of objects to draw.
 
 ### G2 Native directions
 
@@ -69,8 +77,8 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
   trend signals. Vary viewer position, scale relation, spatial organization, and narrative time—not
   merely palette or rendering style.
 - Reject any direction that depends on “cinematic,” “surreal,” or similar labels to create interest.
-- Load [zero-reference-direction.md](references/zero-reference-direction.md) and
-  [visual-narrative.md](references/visual-narrative.md).
+- Load [zero-reference-direction.md](references/zero-reference-direction.md). Load
+  [visual-narrative.md](references/visual-narrative.md) when a narrative or story sequence is intended.
 - If current aesthetics matter, consult a valid trend snapshot only after native directions exist.
   Load [aesthetic-radar.md](references/aesthetic-radar.md).
 - A direction pack is optional. Load [direction-packs.md](references/direction-packs.md) only when
@@ -81,15 +89,16 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Create a shot plan for a hero image or series before full-resolution generation. For a simple
   single image with explicit layout, capture that layout directly in the Spec's generation block.
 - Prove each candidate as a monochrome value thumbnail or explicit mass map: subject envelope,
-  negative space, horizon/plane, eye-line or gaze vector, dominant diagonals, crop pressure, and
-  carrier safe zones.
+  grouping, intervals, crop pressure and carrier safe zones. Add camera, horizon, gaze and depth
+  only when applicable. Use Shot Plan 0.2 for new work; flat layouts need no camera or depth stack.
 - Compare thumbnails at intended feed size. Select by first-read control and narrative consequence.
 - Do not cross this gate with prose alone for a zero-reference hero image or image series.
 - Load [shot-composition-grammar.md](references/shot-composition-grammar.md).
 
 ### G4 Freeze
 
-- Freeze a Visual Spec plus any shot plan required by G3. For a series, also freeze a series plan and color script.
+- Freeze a Visual Spec plus any shot plan required by G3. Preserve the selected concept treatments,
+  spatial mode and detail distribution. For a series, also freeze a series plan and color script.
 - Keep structural invariants separate from shot-level variation. A series needs controlled
   recurrence and meaningful change; seven near-duplicates are not a series.
 - Use [schemas/visual-spec.schema.json](schemas/visual-spec.schema.json),
@@ -109,15 +118,19 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 
 ### G5 Generation brief and preflight
 
-- State a concise `生成前设计说明`: objective, viewer position, first read, composition geometry,
-  narrative beat, color/light logic, required and protected content, and the main failure risk.
+- State a concise `生成前设计说明`: core expression, first read, visual relationships, spatial mode,
+  detail distribution, color/light, required/protected content and the main omission tradeoff.
+  Include viewer role and narrative beat only when applicable.
 - Record the observable backend/model/version, prompt hash, applied parameters, reference roles,
   timestamp and output. Unexposed model fields are `null` with `observation_limits`; do not guess.
   Keep requested, returned and exported dimensions separate. Record weights or seed only if applied.
-- For a single-frame Visual Spec 0.5, use
+- For a single-frame Visual Spec 0.6 (or an existing 0.5), use
   [compile_generation_brief.py](scripts/compile_generation_brief.py), following
   [generation-compiler.md](references/generation-compiler.md). Review its prompt, overlay plan,
-  reference hashes and unapplied parameters before invoking the image tool. Compilation does not generate.
+  reference hashes and unapplied parameters before invoking the image tool. Inspect the separate
+  decision record and coverage: contextual or omitted concepts must not leak back through other
+  render fields. All exact text, mandatory content and protection constraints remain binding.
+  Compilation does not generate or establish semantic consistency.
 - When the attempt responds to user feedback, create and validate
   [schemas/feedback-delta.schema.json](schemas/feedback-delta.schema.json). Separate `change`,
   `preserve`, `prohibit`, element relationships, promoted accidents, and observable verification.
@@ -189,6 +202,10 @@ Use `G0 route` → `G1 proposition` → `G2 native directions` → `G3 compositi
 - Build a blind review packet without prompt rhetoric or the generator's self-justification.
 - Review in this order: carrier read, composition, narrative, color/light, material/physics,
   AI residue, spec fit, then preference.
+- For Spec 0.6, add `spec_pass.selection` findings using
+  [expression-planning.md](references/expression-planning.md): core meaning, attention competition,
+  detail/depth function and the benefit and loss of proposed omissions. Non-narrative images can
+  record narrative as not applicable. Dense or deep compositions do not fail merely for being so.
 - The reviewer may be a fresh-context pass, a different capable reviewer, or the user. A VLM can
   assist but cannot establish invisible facts or final taste.
 - Require independent review for a selected pilot, series expansion, or release—not for every
@@ -292,14 +309,14 @@ Scripts establish technical facts, never meaning or aesthetic merit.
 For direction:
 
 ```text
-命题 / 观众位置 / 第一读与第二读 / 结构选择 / 色光逻辑 / 失败征兆
+核心表达 / 第一读 / 视觉关系与空间 / 取舍 / 色光逻辑 / 失败征兆
 ```
 
 For every generative attempt:
 
 ```text
 生成前设计说明
-目标 / 观众位置 / 第一视觉 / 构图几何 / 叙事拍点 / 色光 / 必须与保护 / 主要风险
+目标 / 第一视觉 / 构图与空间 / 细节分布 / 色光 / 必须与保护 / 省略及损失
 
 生成后检查
 可见符合项 / 偏差证据 / AI痕迹与物理风险 / 最高优先改进

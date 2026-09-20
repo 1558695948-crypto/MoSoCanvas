@@ -1,5 +1,8 @@
 # Visual narrative
 
+Load this for intentional narrative work. Product recognition, decoration or immediate emotion
+can use the core expression workflow without narrative beats, hidden information or a reversal.
+
 ## Give each frame a verb
 
 Name the frame by what changes: `invites`, `waits`, `records`, `anticipates`, `withholds`,

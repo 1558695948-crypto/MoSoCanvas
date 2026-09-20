@@ -23,7 +23,7 @@ MoSoCanvas turns vague visual requests and reference images into a controlled pr
 - `mosocanvas/examples/` — example specs and calibrated cases;
 - `mosocanvas/evals/` — clean-context regression evaluations;
 - `mosocanvas/directions/` — original, optional viewer-relation direction packs;
-- `dist/` — packaged releases and integrity manifests; the published baseline is v1.6.0.
+- `dist/` — packaged releases and integrity manifests; the released baseline is v1.6.0, with a v1.7.0 candidate available for testing.
 
 ## Design principle
 
@@ -32,6 +32,19 @@ MoSoCanvas does not try to replace taste with a universal score. It makes visual
 ## Status
 
 Current release: `1.6.0`.
+
+Development candidate: `1.7.0`. New work uses Visual Spec 0.6 to choose which concepts are
+explicit, expressed through relationships, background context, or intentionally omitted. Narrative
+devices are optional, and Shot Plan 0.2 supports flat, shallow, deep and mixed space. The compiler
+keeps a complete decision record separate from the executable prompt while preserving hard content,
+text and repair obligations. Reviews check meaning retained and omission tradeoffs, including dense
+and deep work. Existing 0.4/0.5 specs retain legacy compilation. See
+[expression planning](mosocanvas/references/expression-planning.md). The candidate passes 83
+automated tests; improved image quality has not yet been demonstrated through a controlled visual study.
+
+Download the [v1.7.0 candidate ZIP](dist/mosocanvas-1.7.0.zip), verify it with the
+[SHA-256 manifest](dist/mosocanvas-1.7.0.manifest.json), and read the
+[version notes](release-notes/v1.7.0.md).
 
 Version 1.3 adds a truthful Codex Image Canvas adapter: focused comments bind to one artifact,
 multi-select edits retain separate parent lineages, and region claims require honest localization.

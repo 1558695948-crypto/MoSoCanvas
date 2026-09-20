@@ -27,6 +27,10 @@ CATEGORIES = (
 )
 
 
+def review_categories(spec_pass: dict) -> tuple[str, ...]:
+    return CATEGORIES + (("selection",) if "selection" in spec_pass else ())
+
+
 def parse_time(value: Any, label: str, blockers: list[str]) -> datetime | None:
     if not isinstance(value, str):
         blockers.append(f"{label} must be an ISO 8601 date-time")
@@ -88,12 +92,14 @@ def validate_authorized_review(
         blockers.append("release authorization requires spec_ref")
     if blind.get("prompt_hidden") is not True:
         blockers.append("release authorization requires a prompt-blind first pass")
-    for category in CATEGORIES:
+    for category in review_categories(spec):
         findings = spec.get(category)
         if not isinstance(findings, list) or not findings:
             blockers.append(
                 f"release authorization requires recorded findings for spec_pass.{category}"
             )
+        elif any(isinstance(item, dict) and item.get("severity") == 3 for item in findings):
+            blockers.append(f"release authorization cannot retain severity-3 findings in {category}")
 
     if registry_path is None:
         blockers.append("release authorization requires an evidence registry")
@@ -128,7 +134,10 @@ def validate_authorized_review(
     spec_ref = str(review.get("spec_ref", ""))
     if spec_ref:
         try:
-            require_evidence(spec_ref, indexed, registry_path, {"visual-spec"})
+            _, spec_path = require_evidence(spec_ref, indexed, registry_path, {"visual-spec"})
+            spec_document = load_object(spec_path, "visual spec")
+            if spec_document.get("schema") == "moso.visual-spec/0.6" and not spec.get("selection"):
+                blockers.append("Visual Spec 0.6 requires selection findings before release")
         except EvidenceError as exc:
             blockers.append(str(exc))
 

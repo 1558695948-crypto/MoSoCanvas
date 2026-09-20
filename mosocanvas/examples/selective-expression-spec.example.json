@@ -1,0 +1,80 @@
+{
+  "schema": "moso.visual-spec/0.6",
+  "id": "future-solitude",
+  "version": 1,
+  "task": {
+    "domain": "poster",
+    "purpose": "以未来文明中的孤独为背景，表达个体与集体之间的距离。",
+    "output_context": "竖版编辑海报，标题后期排版。"
+  },
+  "proposition": {
+    "primary_message": "个体与集体之间的距离。",
+    "desired_response": "感到疏离，不必推断一段隐藏故事。"
+  },
+  "viewer_contract": {"first_read": "排列中唯一孤立的人物剪影。"},
+  "hierarchy": {
+    "first": "孤立的人物剪影是唯一深色焦点。",
+    "second": "浅灰座椅的重复排列提供尺度。"
+  },
+  "constraints": {
+    "must_include": ["一个坐姿人物剪影", "重复排列的浅灰座椅"],
+    "must_avoid": ["会聚的透视线、地平线与远景城市", "未经指定的画内文字或标识"],
+    "preserve": ["人物与其余座椅之间的间隔显著大于其他间隔"]
+  },
+  "strategy": {
+    "selected_direction": "以重复排列中的一个间隔表达疏离。",
+    "structural_mechanisms": ["重复建立秩序", "间隔变化突出个体"]
+  },
+  "relationships": [{
+    "id": "isolation-gap",
+    "subject": "坐姿人物",
+    "relation": "与最近一排座椅的距离是普通椅间距的三倍",
+    "object": "重复座椅阵列",
+    "intended_effect": "通过间隔表达孤独，而非增加象征物。",
+    "scale": "use-scale",
+    "pass_condition": "人物与阵列的间隔明显不同于阵列内部间隔。"
+  }],
+  "expression_plan": {
+    "concepts": [
+      {
+        "id": "person", "concept": "个体", "treatment": "explicit", "required_visible": true,
+        "constraint_refs": ["constraints.must_include[0]"],
+        "render_instruction": "一个坐姿人物剪影",
+        "reason": "用户要求画中保留可识别的人物。"
+      },
+      {
+        "id": "solitude", "concept": "孤独", "treatment": "relational",
+        "relationship_refs": ["isolation-gap"], "constraint_refs": ["constraints.preserve[0]"],
+        "reason": "通过已有元素的距离承载主题。"
+      },
+      {
+        "id": "future", "concept": "未来文明", "treatment": "context-only",
+        "reason": "帮助选择连贯的无接缝材质，不新增科技符号。",
+        "expected_loss": "具体年代不可辨认；主题不依赖年代识别。"
+      },
+      {
+        "id": "history", "concept": "文明演进史", "treatment": "omit",
+        "reason": "这张海报只表达当前关系，不承担背景历史。",
+        "expected_loss": "观众无法从本图推断社会如何形成。"
+      }
+    ],
+    "space": {"mode": "flat", "instruction": "全部形状共用一个正面平面，等大排列，不向远处缩小。"},
+    "detail_distribution": [
+      {"region": "人物", "instruction": "轮廓完整清晰，不添加面部微纹理。"},
+      {"region": "座椅阵列", "instruction": "保留重复节奏，使用低对比轮廓和概括材质。"}
+    ]
+  },
+  "generation": {
+    "subject": "一个坐在独立座椅上的人物剪影，邻近一组重复排列的空座椅。",
+    "medium": "平面丝网印刷插画",
+    "composition": "人物在画面偏下方，座椅阵列横向分组，上方保留标题位置。",
+    "color_light": "暖灰底色、浅灰座椅、深蓝人物；座椅表面无接缝，光照均匀。",
+    "text": [{"id": "title", "text": "在场之外", "placement": "顶部", "method": "overlay"}],
+    "target_size": {"width": 1200, "height": 1600}
+  },
+  "evaluation": {
+    "observable_pass_conditions": ["缩略图可识别孤立人物", "使用尺寸可辨认不等间隔", "座椅远近等大且没有会聚线"],
+    "known_failure_signs": ["背景阵列比人物更抢眼", "人物被省略", "新增场景解释挤占空间"],
+    "user_judgment_required": ["疏离感是否达到预期；保留的语义是否足够准确"]
+  }
+}

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 from image_contract import sha256
-from review_integrity import CATEGORIES
+from review_integrity import review_categories
 
 ROOT = Path(__file__).resolve().parents[1]
 BLIND_FIELDS = ("prompt_hidden", "first_read", "eye_path", "inferred_narrative", "observed_anomalies")
@@ -87,7 +87,7 @@ def aggregate(seal_path: Path, spec_path: Path, votes: list[Path]) -> dict:
     contexts = {m["review_context_id"] for m in seal["members"]}
     if len(members) != 3 or len(contexts) != 3 or seal["generation_context_id"] in contexts:
         raise ValueError("seal requires three distinct non-generating contexts")
-    read(spec_path)  # A bounded review brief may be used instead of a full generation Spec.
+    spec_document = read(spec_path)  # A bounded review brief may be used instead of a full generation Spec.
     spec_hash, seal_hash = sha256(spec_path), sha256(seal_path)
     seen: set[str] = set()
     counts: Counter = Counter()
@@ -132,7 +132,9 @@ def aggregate(seal_path: Path, spec_path: Path, votes: list[Path]) -> dict:
             raise ValueError("review rewrote the sealed first impression")
         if review["decision"]["release_authorized"] is not False:
             raise ValueError("panel votes cannot authorize publication")
-        for category in CATEGORIES:
+        if spec_document.get("schema") == "moso.visual-spec/0.6" and not review["spec_pass"].get("selection"):
+            raise ValueError("Visual Spec 0.6 requires selection findings from every reviewer")
+        for category in review_categories(review["spec_pass"]):
             findings = review["spec_pass"][category]
             if not findings:
                 raise ValueError(f"all reviewers must inspect the common rubric: {category}")

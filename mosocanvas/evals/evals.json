@@ -1,5 +1,5 @@
 {
-  "suite": "mosocanvas-v1.6.0",
+  "suite": "mosocanvas-v1.7.0",
   "scope": "campaign key visuals, posters, and physical promotional collateral",
   "conditions": ["B0-direct", "B1-generic-clarify-first", "M0-mosocanvas"],
   "cases": [
@@ -317,7 +317,7 @@
       "fixtures": ["zero-reference direction selected", "no composition proof"],
       "expected": [
         "creates or requests a monochrome value thumbnail or mass map before full-resolution generation",
-        "records viewpoint, mass relation, negative-space owner, vectors, crop pressure, and carrier safe zones",
+        "records spatial mode, mass relation, intervals, vectors, crop pressure and carrier safe zones; viewpoint only when applicable",
         "tests the first read at feed thumbnail scale"
       ],
       "forbidden": [
@@ -659,6 +659,90 @@
       "forbidden": [
         "promoting raw generator output directly to current render",
         "committing a missed target or exceeded protected drift"
+      ]
+    },
+    {
+      "id": "selective-background-is-not-an-inventory",
+      "input": "做一张关于未来文明中孤独的海报，重点是人与集体的距离，背景资料包括城市、交通和文明演进。",
+      "expected": [
+        "uses Spec 0.6 and assigns important concepts explicit, relational, context-only or omit treatments",
+        "chooses visible relationships that preserve the core meaning",
+        "keeps context and omission rationale in the decision record rather than copying them into the image tool prompt",
+        "checks other render fields for accidentally reintroduced omitted objects"
+      ],
+      "forbidden": [
+        "turning every background noun into a visible object",
+        "claiming the compiler proves audience understanding"
+      ]
+    },
+    {
+      "id": "flat-direct-expression-needs-no-narrative",
+      "input": "做一张平面的咖啡新品海报，杯子、品名和售价一眼可见，没有隐藏故事，不需要场景纵深。",
+      "expected": [
+        "uses a direct expression with optional narrative fields absent",
+        "retains cup, exact name and price as mandatory content with explicit text method",
+        "uses flat spatial mode; a new shot plan omits camera, horizon and depth stack"
+      ],
+      "forbidden": [
+        "inventing an anomaly, information imbalance or second-read twist",
+        "adding a corridor or city to satisfy spatial fields"
+      ]
+    },
+    {
+      "id": "organized-density-remains-valid",
+      "input": "做一张细节繁复的节庆群像，十位角色都必须出现，主次清楚，但不要改成极简海报。",
+      "expected": [
+        "preserves all ten required visible characters",
+        "organizes groups, intervals, contrast and detail distribution for the intended carrier",
+        "evaluates complexity by function and observable interference",
+        "retains mandatory characters through selective compilation"
+      ],
+      "forbidden": [
+        "dropping characters to raise a compression score",
+        "imposing a universal three-element limit or blank-space quota"
+      ]
+    },
+    {
+      "id": "depth-with-a-purpose-remains-valid",
+      "input": "用深透视表现队伍越排越远的等待感，近处人物可辨认，远处人物形成整体节奏。",
+      "expected": [
+        "selects deep space and records its role in the expression",
+        "distributes detail between nearby figures and distant repeated masses",
+        "preserves the requested perspective through compilation and review"
+      ],
+      "forbidden": [
+        "flattening the image merely because depth is considered a bias",
+        "treating detail across distant regions as automatically good or bad"
+      ]
+    },
+    {
+      "id": "omission-must-preserve-specific-meaning",
+      "input": "用一个简洁的视觉关系表达内卷：每个人投入增加，但相对位置没有变化。",
+      "expected": [
+        "preserves the specified relationship between increasing effort and unchanged relative position",
+        "reviews what the image communicates without reading the prompt",
+        "records the loss as well as benefit of removing a cue"
+      ],
+      "forbidden": [
+        "assuming a lone runner in a circle necessarily conveys competition",
+        "rewarding fewer symbols despite loss of the requested meaning"
+      ]
+    },
+    {
+      "id": "selection-review-is-not-minimalism-scoring",
+      "input": "比较一张安静的海报和一张繁复但组织清楚的海报，判断它们是否适合各自用途。",
+      "fixtures": [
+        "two actual artifacts with their separate frozen purposes and carriers"
+      ],
+      "expected": [
+        "records blind observations before reading the intended explanations",
+        "uses selection findings for meaning retained, attention competition, detail/depth function and omission tradeoffs",
+        "allows dense and sparse work to pass according to its purpose",
+        "distinguishes reviewer inference from measured audience response"
+      ],
+      "forbidden": [
+        "ranking images by object count or grayscale entropy alone",
+        "inventing eye-tracking percentages or a universal aesthetic score"
       ]
     }
   ],
